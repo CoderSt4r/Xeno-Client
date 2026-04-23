@@ -1,4 +1,5 @@
 const { app, BrowserWindow, ipcMain } = require('electron');
+if (process.platform === 'linux') app.commandLine.appendSwitch('no-sandbox');
 const path = require('path');
 const fs = require('fs');
 const https = require('https');
