@@ -26,7 +26,10 @@
         "deb"
       ],
       "category": "Game",
-      "maintainer": "Xeno <contact@xenoclient.com>"
+      "maintainer": "Xeno <contact@xenoclient.com>",
+      "executableArgs": [
+        "--no-sandbox"
+      ]
     },
     "publish": [
       {
