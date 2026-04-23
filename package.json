@@ -49,10 +49,10 @@
   "devDependencies": {
     "electron": "^41.3.0",
     "electron-builder": "^26.8.1",
-    "electron-updater": "^6.8.3",
     "javascript-obfuscator": "^5.4.1"
   },
   "dependencies": {
+    "electron-updater": "^6.8.3",
     "extract-zip": "^2.0.1",
     "minecraft-launcher-core": "^3.18.2",
     "msmc": "^5.0.5",
