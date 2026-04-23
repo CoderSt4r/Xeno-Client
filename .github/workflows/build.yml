@@ -26,5 +26,6 @@ jobs:
 
       - name: Build and Release
         run: npm run release
+        shell: bash
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
