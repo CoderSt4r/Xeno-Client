@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,9 +9,7 @@
         rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 </head>
-
 <body>
-    <!-- Custom Titlebar -->
     <div class="titlebar" id="titlebar">
         <div class="titlebar-left">
             <div class="app-logo">
@@ -27,9 +24,7 @@
             <button id="close-btn" class="ctrl-btn danger"><i class="ph ph-x"></i></button>
         </div>
     </div>
-
     <div class="main-layout">
-        <!-- Icon Sidebar -->
         <nav class="icon-sidebar">
             <div class="sidebar-top">
                 <button class="nav-icon active" data-page="home" title="Home">
@@ -57,11 +52,7 @@
                 </div>
             </div>
         </nav>
-
-        <!-- Page Content -->
         <div class="page-container">
-
-            <!-- ===== HOME PAGE ===== -->
             <div class="page active" id="page-home">
                 <div class="home-layout">
                     <div class="home-main">
@@ -69,8 +60,6 @@
                             <h1>Welcome back, <span id="home-username" class="accent-text">Player</span></h1>
                             <p class="subtitle">Jump back in or explore something new.</p>
                         </div>
-
-                        <!-- Active Profile Launch Card -->
                         <div class="active-profile-card" id="active-profile-card">
                             <div class="profile-card-icon">
                                 <i class="ph-fill ph-cube-focus"></i>
@@ -101,8 +90,6 @@
                                 </button>
                             </div>
                         </div>
-
-                        <!-- Recent Profiles -->
                         <div class="section">
                             <div class="section-header">
                                 <h2>Your Profiles</h2>
@@ -110,11 +97,9 @@
                                     New</button>
                             </div>
                             <div class="profiles-list" id="home-profiles-list">
-                                <!-- Populated by JS -->
                             </div>
                         </div>
                     </div>
-
                     <div class="home-sidebar">
                         <div class="sidebar-card account-card">
                             <div class="sidebar-card-title">Playing as</div>
@@ -137,8 +122,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- ===== PROFILES PAGE ===== -->
             <div class="page" id="page-profiles">
                 <div class="page-header">
                     <div>
@@ -149,13 +132,9 @@
                         <i class="ph ph-plus"></i> Create Profile
                     </button>
                 </div>
-
                 <div class="profiles-grid" id="profiles-grid">
-                    <!-- Populated by JS -->
                 </div>
             </div>
-
-            <!-- ===== MOD BROWSER PAGE ===== -->
             <div class="page" id="page-mods">
                 <div class="page-header">
                     <div>
@@ -219,8 +198,6 @@
                     <button class="btn-secondary" id="mods-next-btn"><i class="ph ph-arrow-right"></i> Next</button>
                 </div>
             </div>
-
-            <!-- ===== LIBRARY PAGE ===== -->
             <div class="page" id="page-library">
                 <div class="page-header">
                     <div>
@@ -236,8 +213,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- ===== SETTINGS PAGE ===== -->
             <div class="page" id="page-settings">
                 <div class="page-header">
                     <div>
@@ -245,7 +220,6 @@
                         <p class="subtitle">Configure your launcher experience.</p>
                     </div>
                 </div>
-
                 <div class="settings-layout">
                     <nav class="settings-tabs">
                         <button class="settings-tab active" data-tab="account">
@@ -258,9 +232,7 @@
                             <i class="ph ph-sliders"></i> Launcher
                         </button>
                     </nav>
-
                     <div class="settings-content">
-                        <!-- Account Tab -->
                         <div class="settings-panel active" id="tab-account">
                             <div class="settings-section">
                                 <h3>Account Type</h3>
@@ -289,7 +261,6 @@
                                     </label>
                                 </div>
                             </div>
-
                             <div class="settings-section" id="offline-section">
                                 <h3>Offline Username</h3>
                                 <div class="input-row">
@@ -297,7 +268,6 @@
                                         placeholder="Your ingame name">
                                 </div>
                             </div>
-
                             <div class="settings-section hidden" id="microsoft-section">
                                 <h3>Microsoft Account</h3>
                                 <div class="ms-account-status" id="ms-account-status">
@@ -310,8 +280,6 @@
                                 </div>
                             </div>
                         </div>
-
-                        <!-- Java & Performance Tab -->
                         <div class="settings-panel" id="tab-java">
                             <div class="settings-section">
                                 <h3>Java Path</h3>
@@ -348,8 +316,6 @@
                                     placeholder="-XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200"></textarea>
                             </div>
                         </div>
-
-                        <!-- Launcher Tab -->
                         <div class="settings-panel" id="tab-launcher">
                             <div class="settings-section">
                                 <h3>Game Window Resolution</h3>
@@ -404,7 +370,6 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="settings-footer">
                     <button class="btn-primary" id="save-settings-btn">
                         <i class="ph ph-floppy-disk"></i> Save Settings
@@ -412,9 +377,6 @@
                     <span id="settings-saved-msg" class="saved-msg hidden">✓ Settings saved!</span>
                 </div>
             </div>
-
-
-            <!-- ===== SOCIAL PAGE ===== -->
             <div class="page" id="page-social">
                 <div class="page-header">
                     <div>
@@ -478,10 +440,6 @@
             </div>
         </div>
     </div>
-
-    <!-- ===== MODALS ===== -->
-
-    <!-- Create/Edit Profile Modal -->
     <div class="modal-backdrop hidden" id="profile-modal-backdrop">
         <div class="modal" id="profile-modal">
             <div class="modal-header">
@@ -527,8 +485,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Mod Detail Modal -->
     <div class="modal-backdrop hidden" id="mod-modal-backdrop">
         <div class="modal mod-modal" id="mod-modal">
             <div class="modal-header">
@@ -565,8 +521,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Update Notification -->
     <div id="update-notification" class="hidden">
         <div class="update-content">
             <i class="ph-fill ph-arrow-circle-up"></i>
@@ -577,8 +531,6 @@
             <button id="restart-button" class="btn-primary btn-sm hidden">Restart to Update</button>
         </div>
     </div>
-
     <script src="renderer.js"></script>
 </body>
-
 </html>

@@ -1,4 +1,3 @@
-// ===== STATE =====
 let profiles = JSON.parse(localStorage.getItem('xc-profiles') || '[]');
 let activeProfileId = localStorage.getItem('xc-active-profile') || null;
 let settings = JSON.parse(localStorage.getItem('xc-settings') || '{}');
@@ -8,15 +7,13 @@ let selectedModData = null;
 let editingProfileId = null;
 let selectedColor = '#6366f1';
 let mcVersions = [];
-let xcSession = JSON.parse(localStorage.getItem('xc-session') || 'null'); // XenoClient launcher account
-
+let xcSession = JSON.parse(localStorage.getItem('xc-session') || 'null'); 
 if (profiles.length === 0) {
     profiles = [{ id: 'default', name: 'Vanilla 1.20.1', version: '1.20.1', loader: 'vanilla', color: '#6366f1', mods: [] }];
     activeProfileId = 'default';
     saveProfiles();
 }
 if (!activeProfileId) { activeProfileId = profiles[0]?.id; localStorage.setItem('xc-active-profile', activeProfileId); }
-
 function saveProfiles() {
     localStorage.setItem('xc-profiles', JSON.stringify(profiles));
     localStorage.setItem('xc-active-profile', activeProfileId);
@@ -25,13 +22,9 @@ function getActiveProfile() { return profiles.find(p => p.id === activeProfileId
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
 function fmtNum(n) { if (n >= 1e6) return (n/1e6).toFixed(1)+'M'; if (n >= 1e3) return (n/1e3).toFixed(0)+'K'; return n; }
 function fmtDate(s) { return new Date(s).toLocaleDateString(); }
-
-// ===== TITLEBAR =====
 document.getElementById('minimize-btn').onclick = () => window.electronAPI.windowMinimize();
 document.getElementById('maximize-btn').onclick = () => window.electronAPI.windowMaximize();
 document.getElementById('close-btn').onclick = () => window.electronAPI.windowClose();
-
-// ===== NAVIGATION =====
 document.querySelectorAll('.nav-icon[data-page]').forEach(btn => {
     btn.addEventListener('click', () => {
         document.querySelectorAll('.nav-icon').forEach(b => b.classList.remove('active'));
@@ -46,12 +39,9 @@ document.querySelectorAll('.nav-icon[data-page]').forEach(btn => {
         if (btn.dataset.page === 'settings') loadSettingsUI();
     });
 });
-
 function navTo(page) {
     document.querySelector(`.nav-icon[data-page="${page}"]`)?.click();
 }
-
-// ===== HOME =====
 function renderHome() {
     const p = getActiveProfile();
     if (!p) return;
@@ -63,7 +53,6 @@ function renderHome() {
     document.getElementById('active-profile-card').querySelector('.profile-card-icon').style.background = p.color || '#6366f1';
     document.getElementById('home-account-name').textContent = getDisplayName();
     document.getElementById('home-account-type').textContent = (settings.accountType === 'microsoft' && settings.msUsername) ? 'Microsoft (Premium)' : 'Offline';
-
     const list = document.getElementById('home-profiles-list');
     list.innerHTML = '';
     profiles.forEach(pr => {
@@ -89,19 +78,15 @@ function renderHome() {
         });
     });
 }
-
 document.getElementById('change-profile-btn').onclick = () => navTo('profiles');
 document.getElementById('new-profile-shortcut-btn').onclick = () => openProfileModal();
 document.getElementById('link-modrinth').onclick = (e) => { e.preventDefault(); navTo('mods'); };
 document.getElementById('link-settings').onclick = (e) => { e.preventDefault(); navTo('settings'); };
 document.getElementById('link-new-profile').onclick = (e) => { e.preventDefault(); openProfileModal(); };
-
-// ===== LAUNCH =====
 const launchBtn = document.getElementById('launch-btn');
 const launchStatusText = document.getElementById('launch-status-text');
 const launchProgressTrack = document.getElementById('launch-progress-track');
 const launchProgressFill = document.getElementById('launch-progress-fill');
-
 launchBtn.addEventListener('click', () => {
     if (launchBtn.disabled) return;
     const p = getActiveProfile();
@@ -124,7 +109,6 @@ launchBtn.addEventListener('click', () => {
     launchProgressTrack.classList.remove('hidden');
     launchProgressFill.style.width = '5%';
 });
-
 window.electronAPI.onLauncherStatus((data) => {
     launchStatusText.textContent = data.message;
     if (data.type === 'progress') {
@@ -139,15 +123,12 @@ window.electronAPI.onLauncherStatus((data) => {
         resetLaunch(); launchStatusText.textContent = 'Error: ' + data.message;
     }
 });
-
 function resetLaunch() {
     launchBtn.disabled = false;
     launchBtn.innerHTML = '<i class="ph-fill ph-play"></i> Play';
     launchProgressFill.style.width = '0%';
     setTimeout(() => launchProgressTrack.classList.add('hidden'), 500);
 }
-
-// ===== PROFILES PAGE =====
 function renderProfilesPage() {
     const grid = document.getElementById('profiles-grid');
     grid.innerHTML = '';
@@ -171,7 +152,6 @@ function renderProfilesPage() {
     addCard.innerHTML = '<i class="ph ph-plus-circle"></i><span>New Profile</span>';
     addCard.onclick = () => openProfileModal();
     grid.appendChild(addCard);
-
     grid.querySelectorAll('.play-profile-btn').forEach(btn => btn.addEventListener('click', (e) => {
         e.stopPropagation(); activeProfileId = btn.dataset.id; saveProfiles(); renderHome(); navTo('home');
     }));
@@ -186,15 +166,11 @@ function renderProfilesPage() {
         saveProfiles(); renderProfilesPage();
     }));
 }
-document.getElementById('create-profile-btn').onclick = () => openProfileModal();
-
-// ===== PROFILE MODAL =====
 function openProfileModal(id = null) {
     editingProfileId = id;
     selectedColor = '#6366f1';
     const modal = document.getElementById('profile-modal-backdrop');
     modal.classList.remove('hidden');
-    // Populate version dropdown
     const verSel = document.getElementById('profile-version-input');
     verSel.innerHTML = '';
     if (mcVersions.length) {
@@ -238,7 +214,6 @@ document.querySelectorAll('.color-swatch').forEach(s => s.addEventListener('clic
     document.querySelectorAll('.color-swatch').forEach(sw => sw.classList.remove('active'));
     s.classList.add('active');
 }));
-
 function closeProfileModal() { document.getElementById('profile-modal-backdrop').classList.add('hidden'); }
 document.getElementById('close-profile-modal').onclick = closeProfileModal;
 document.getElementById('cancel-profile-modal').onclick = closeProfileModal;
@@ -258,15 +233,13 @@ document.getElementById('save-profile-btn').addEventListener('click', () => {
     }
     saveProfiles(); closeProfileModal(); renderProfilesPage(); renderHome();
 });
-
-// ===== MOD BROWSER =====
 function renderModPage() {
     updateModInstallProfileSelect();
     populateLibrarySelect();
 }
 async function fetchMods() {
     const grid = document.getElementById('mods-grid');
-    grid.innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Fetching mods from Modrinth...</p></div>';
+    grid.innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Fetching mods...</p></div>';
     const q = currentModQuery;
     const cat = document.getElementById('mod-category-filter').value;
     const loader = document.getElementById('mod-loader-filter').value;
@@ -278,7 +251,7 @@ async function fetchMods() {
     if (loader) facets.push(`["categories:${loader}"]`);
     if (ver) facets.push(`["versions:${ver}"]`);
     const facetStr = facets.length ? `&facets=[${facets.join(',')}]` : '';
-    const url = `https://api.modrinth.com/v2/search?query=${encodeURIComponent(q)}&limit=20&offset=${offset}&index=${sort}${facetStr}`;
+    const url = `https://api.modrinth.com/v2/project/search?query=${q}&facets=[["project_type:mod"],["categories:${loader}"]]${facetStr}&limit=20&offset=${offset}&index=${sort}`;
     try {
         const res = await fetch(url, { headers: { 'User-Agent': 'XenoClient/1.0' } });
         const data = await res.json();
@@ -287,14 +260,13 @@ async function fetchMods() {
         document.getElementById('mods-prev-btn').disabled = currentModPage === 0;
         document.getElementById('mods-next-btn').disabled = (data.hits||[]).length < 20;
     } catch(e) {
-        grid.innerHTML = '<div class="loading-state"><i class="ph ph-wifi-slash" style="font-size:40px"></i><p>Failed to fetch mods. Check your internet.</p></div>';
+        grid.innerHTML = '<div class="loading-state"><i class="ph ph-wifi-slash"></i><p>Connection error.</p></div>';
     }
 }
-
 function renderMods(hits) {
     const grid = document.getElementById('mods-grid');
     grid.innerHTML = '';
-    if (!hits.length) { grid.innerHTML = '<div class="loading-state"><i class="ph ph-magnifying-glass" style="font-size:40px"></i><p>No results found.</p></div>'; return; }
+    if (!hits.length) { grid.innerHTML = '<div class="loading-state"><i class="ph ph-magnifying-glass"></i><p>No results.</p></div>'; return; }
     hits.forEach(mod => {
         const card = document.createElement('div');
         card.className = 'mod-card';
@@ -319,7 +291,6 @@ function renderMods(hits) {
         grid.appendChild(card);
     });
 }
-
 let debounceTimer;
 document.getElementById('mod-search-input').addEventListener('input', (e) => {
     clearTimeout(debounceTimer);
@@ -330,8 +301,6 @@ document.getElementById('mod-search-input').addEventListener('input', (e) => {
 });
 document.getElementById('mods-prev-btn').onclick = () => { if(currentModPage > 0) { currentModPage--; fetchMods(); } };
 document.getElementById('mods-next-btn').onclick = () => { currentModPage++; fetchMods(); };
-
-// ===== MOD MODAL =====
 function openModModal(mod) {
     selectedModData = mod;
     document.getElementById('mod-modal-name').textContent = mod.title;
@@ -351,36 +320,25 @@ function openModModal(mod) {
 function closeModModal() { document.getElementById('mod-modal-backdrop').classList.add('hidden'); }
 document.getElementById('close-mod-modal').onclick = closeModModal;
 document.getElementById('close-mod-modal-btn').onclick = closeModModal;
-
 document.getElementById('install-mod-btn').addEventListener('click', async () => {
     if (!selectedModData) return;
     const profileId = document.getElementById('mod-install-profile').value;
     const profile = profiles.find(p => p.id === profileId);
     if (!profile) return;
     if (!profile.mods) profile.mods = [];
-    if (profile.mods.find(m => m.id === selectedModData.project_id)) {
-        return alert('Mod already added to this profile!');
-    }
-
+    if (profile.mods.find(m => m.id === selectedModData.project_id)) return alert('Mod already added!');
     const installBtn = document.getElementById('install-mod-btn');
     installBtn.disabled = true;
     installBtn.innerHTML = '<i class="ph ph-spinner"></i> Downloading...';
-
     const result = await window.electronAPI.downloadMod({
         modId: selectedModData.project_id,
         profileName: profile.name,
         profileVersion: profile.version,
         profileLoader: profile.loader
     });
-
     installBtn.disabled = false;
     installBtn.innerHTML = '<i class="ph ph-download-simple"></i> Add to Profile';
-
-    if (!result.success) {
-        alert('Download failed: ' + result.error);
-        return;
-    }
-
+    if (!result.success) return alert('Download failed: ' + result.error);
     profile.mods.push({
         id: selectedModData.project_id,
         name: selectedModData.title,
@@ -392,16 +350,12 @@ document.getElementById('install-mod-btn').addEventListener('click', async () =>
     saveProfiles();
     closeModModal();
     renderHome();
-    alert(`✓ "${selectedModData.title}" downloaded and added to "${profile.name}"!`);
 });
-
 function updateModInstallProfileSelect() {
     const sel = document.getElementById('mod-install-profile');
     sel.innerHTML = profiles.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
     sel.value = activeProfileId;
 }
-
-// ===== LIBRARY =====
 function populateLibrarySelect() {
     const sel = document.getElementById('library-profile-select');
     sel.innerHTML = profiles.map(p => `<option value="${p.id}">${p.name}</option>`).join('');
@@ -414,7 +368,7 @@ function renderLibrary() {
     const list = document.getElementById('installed-mods-list');
     const mods = profile?.mods || [];
     if (!mods.length) {
-        list.innerHTML = '<div class="empty-state"><i class="ph ph-puzzle-piece"></i><p>No mods installed yet. Browse the Mod Browser to add some!</p></div>';
+        list.innerHTML = '<div class="empty-state"><i class="ph ph-puzzle-piece"></i><p>No mods installed.</p></div>';
         return;
     }
     list.innerHTML = '';
@@ -427,7 +381,7 @@ function renderLibrary() {
                 <div class="installed-mod-name">${mod.name}</div>
                 <div class="installed-mod-meta">by ${mod.author} • ${mod.version}</div>
             </div>
-            <button class="btn-icon-danger remove-mod-btn" data-idx="${idx}" title="Remove"><i class="ph ph-trash"></i></button>`;
+            <button class="btn-icon-danger remove-mod-btn" data-idx="${idx}"><i class="ph ph-trash"></i></button>`;
         list.appendChild(row);
     });
     list.querySelectorAll('.remove-mod-btn').forEach(btn => btn.addEventListener('click', () => {
@@ -436,8 +390,6 @@ function renderLibrary() {
     }));
 }
 document.getElementById('library-profile-select').addEventListener('change', renderLibrary);
-
-// ===== SETTINGS =====
 document.querySelectorAll('.settings-tab').forEach(tab => {
     tab.addEventListener('click', () => {
         document.querySelectorAll('.settings-tab').forEach(t => t.classList.remove('active'));
@@ -446,7 +398,6 @@ document.querySelectorAll('.settings-tab').forEach(tab => {
         document.getElementById('tab-' + tab.dataset.tab).classList.add('active');
     });
 });
-
 function loadSettingsUI() {
     const s = settings;
     document.getElementById('username-input').value = s.username || 'Player';
@@ -465,11 +416,10 @@ function loadSettingsUI() {
     toggleAccountSections(accountType);
     if (accountType === 'microsoft' && s.msUsername) {
         document.getElementById('ms-status-name').textContent = s.msUsername;
-        document.getElementById('ms-status-sub').textContent = 'Logged in to Microsoft';
+        document.getElementById('ms-status-sub').textContent = 'Linked Account';
         document.getElementById('ms-login-btn').textContent = 'Sign Out';
     }
 }
-
 function updateSliderLabels() {
     const minV = parseInt(document.getElementById('ram-min-input').value);
     const maxV = parseInt(document.getElementById('ram-max-input').value);
@@ -478,7 +428,6 @@ function updateSliderLabels() {
 }
 document.getElementById('ram-min-input').addEventListener('input', updateSliderLabels);
 document.getElementById('ram-max-input').addEventListener('input', updateSliderLabels);
-
 function toggleAccountSections(type) {
     document.getElementById('offline-section').classList.toggle('hidden', type !== 'offline');
     document.getElementById('microsoft-section').classList.toggle('hidden', type !== 'microsoft');
@@ -486,7 +435,6 @@ function toggleAccountSections(type) {
 document.querySelectorAll('input[name="account-type"]').forEach(r => {
     r.addEventListener('change', () => toggleAccountSections(r.value));
 });
-
 document.getElementById('save-settings-btn').addEventListener('click', () => {
     settings.accountType = document.querySelector('input[name="account-type"]:checked').value;
     settings.username = document.getElementById('username-input').value || 'Player';
@@ -505,26 +453,21 @@ document.getElementById('save-settings-btn').addEventListener('click', () => {
     setTimeout(() => msg.classList.add('hidden'), 2500);
     renderHome();
 });
-
-
-// ===== SOCIAL PAGE =====
 const MOJANG_API = 'https://api.mojang.com/users/profiles/minecraft/';
 const CRAFATAR = 'https://crafatar.com';
-
 async function fetchMojang(username) {
     const res = await fetch(MOJANG_API + encodeURIComponent(username));
     if (res.status === 404) return null;
-    if (!res.ok) throw new Error('Mojang API error');
+    if (!res.ok) throw new Error('API error');
     return res.json();
 }
 function skinUrl(uuid, type = 'avatars', size = 80) {
     return `${CRAFATAR}/${type}/${uuid}?size=${size}&overlay=true&default=MHF_Steve`;
 }
-
 function renderSocialPage() {
     const session = xcSession;
     const nameEl = document.getElementById('my-profile-username');
-    if (session) nameEl.textContent = session.username || 'Unknown';
+    if (session) nameEl.textContent = session.username || 'User';
     document.getElementById('stat-profiles').textContent = profiles.length;
     const totalMods = profiles.reduce((s, p) => s + (p.mods || []).length, 0);
     document.getElementById('stat-mods').textContent = totalMods;
@@ -559,10 +502,10 @@ function renderSocialPage() {
         const previewEl = document.getElementById('mc-link-preview');
         const confirmBtn = document.getElementById('mc-confirm-btn');
         errEl.classList.add('hidden'); previewEl.classList.add('hidden'); confirmBtn.classList.add('hidden');
-        if (!username) { errEl.textContent = 'Please enter a username.'; errEl.classList.remove('hidden'); return; }
+        if (!username) return;
         try {
             const data = await fetchMojang(username);
-            if (!data) { errEl.textContent = 'Player not found on Mojang.'; errEl.classList.remove('hidden'); return; }
+            if (!data) { errEl.textContent = 'Not found.'; errEl.classList.remove('hidden'); return; }
             document.getElementById('mc-link-avatar').src = skinUrl(data.id, 'avatars', 48);
             document.getElementById('mc-link-found-name').textContent = data.name;
             document.getElementById('mc-link-found-uuid').textContent = data.id;
@@ -573,58 +516,52 @@ function renderSocialPage() {
                 renderSocialPage();
             };
         } catch(e) {
-            errEl.textContent = 'Lookup failed. Check your connection.';
-            errEl.classList.remove('hidden');
+            errEl.textContent = 'Error.'; errEl.classList.remove('hidden');
         }
     };
 }
-
 document.getElementById('player-search-btn').addEventListener('click', searchPlayers);
 document.getElementById('player-search-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') searchPlayers(); });
-
 async function searchPlayers() {
     const q = document.getElementById('player-search-input').value.trim();
     const resultsEl = document.getElementById('player-results');
     if (!q) return;
-    resultsEl.innerHTML = '<div class="player-not-found"><div class="spinner"></div><p>Looking up player...</p></div>';
+    resultsEl.innerHTML = '<div class="player-not-found"><div class="spinner"></div></div>';
     try {
         const data = await fetchMojang(q);
-        if (!data) { resultsEl.innerHTML = '<div class="player-not-found"><i class="ph ph-user-x"></i><p>No player found with that username.</p></div>'; return; }
+        if (!data) { resultsEl.innerHTML = '<div class="player-not-found"><p>No results.</p></div>'; return; }
         const accounts = JSON.parse(localStorage.getItem('xc-accounts') || '{}');
         const xcAcct = Object.values(accounts).find(a => a.username?.toLowerCase() === data.name.toLowerCase());
         const card = document.createElement('div');
         card.className = 'player-card';
         card.innerHTML = `
-            <div class="player-card-skin"><img src="${skinUrl(data.id, 'renders/body', 52)}" alt="skin" onerror="this.style.display='none'"></div>
+            <div class="player-card-skin"><img src="${skinUrl(data.id, 'renders/body', 52)}" alt="skin"></div>
             <div class="player-card-info">
                 <div class="player-card-name">${data.name}</div>
                 <div class="player-card-uuid">${data.id}</div>
                 <div class="player-card-badges">
-                    <span class="player-badge badge-mc"><i class="ph ph-cube"></i> Minecraft</span>
-                    ${xcAcct ? '<span class="player-badge badge-xeno"><i class="ph ph-cube-focus"></i> XenoClient User</span>' : ''}
+                    <span class="player-badge badge-mc">Minecraft</span>
+                    ${xcAcct ? '<span class="player-badge badge-xeno">XenoClient</span>' : ''}
                 </div>
             </div>
-            <a href="https://namemc.com/profile/${data.id}" target="_blank" class="btn-secondary btn-sm"><i class="ph ph-arrow-square-out"></i> NameMC</a>`;
+            <a href="https://namemc.com/profile/${data.id}" target="_blank" class="btn-secondary btn-sm">NameMC</a>`;
         resultsEl.innerHTML = '';
         resultsEl.appendChild(card);
     } catch(e) {
-        resultsEl.innerHTML = '<div class="player-not-found"><i class="ph ph-wifi-slash"></i><p>Failed to search. Check your connection.</p></div>';
+        resultsEl.innerHTML = '<div class="player-not-found"><p>Search error.</p></div>';
     }
 }
-
 document.getElementById('sidebar-avatar').addEventListener('click', () => navTo('social'));
-
-// ===== MS LOGIN =====
 document.getElementById('ms-login-btn').addEventListener('click', () => {
     if (settings.msUsername) {
         delete settings.msUsername; settings.accountType = 'offline';
         document.getElementById('type-offline').checked = true;
         toggleAccountSections('offline');
         document.getElementById('ms-status-name').textContent = 'Not logged in';
-        document.getElementById('ms-status-sub').textContent = 'Click the button to sign in with Microsoft';
+        document.getElementById('ms-status-sub').textContent = 'Sign in with Microsoft';
         document.getElementById('ms-login-btn').textContent = 'Sign In';
     } else {
-        document.getElementById('ms-status-sub').textContent = 'Opening Microsoft login...';
+        document.getElementById('ms-status-sub').textContent = 'Opening login...';
         window.electronAPI.msLogin();
     }
 });
@@ -633,46 +570,31 @@ window.electronAPI.onMsLogin((data) => {
         settings.msUsername = data.username; settings.accountType = 'microsoft';
         localStorage.setItem('xc-settings', JSON.stringify(settings));
         document.getElementById('ms-status-name').textContent = data.username;
-        document.getElementById('ms-status-sub').textContent = 'Logged in to Microsoft';
+        document.getElementById('ms-status-sub').textContent = 'Linked Account';
         document.getElementById('ms-login-btn').textContent = 'Sign Out';
         renderHome();
     } else {
-        document.getElementById('ms-status-sub').textContent = 'Login failed: ' + data.error;
+        document.getElementById('ms-status-sub').textContent = 'Error: ' + data.error;
     }
 });
-
 function getDisplayName() {
     if (settings.accountType === 'microsoft' && settings.msUsername) return settings.msUsername;
     return settings.username || 'Player';
 }
-
-// ===== INIT =====
 renderHome();
 loadSettingsUI();
-
-// Receive session from login page
 window.electronAPI.onSession((session) => {
     xcSession = session;
     localStorage.setItem('xc-session', JSON.stringify(session));
     updateSessionUI();
 });
-
 function updateSessionUI() {
     if (!xcSession) return;
     const name = xcSession.username || 'User';
-    // Update sidebar avatar tooltip
     const avatar = document.getElementById('sidebar-avatar');
     if (avatar) avatar.title = name;
-    // Update home welcome if username not set in settings
-    if (!settings.username || settings.username === 'Player') {
-        document.getElementById('home-username').textContent = name;
-    }
 }
-
-// Apply session on load if already stored
 updateSessionUI();
-
-// Fetch MC versions in background on startup
 window.electronAPI.getVersions().then(versions => {
     mcVersions = versions || [];
     const vf = document.getElementById('mod-version-filter');
@@ -685,27 +607,17 @@ window.electronAPI.getVersions().then(versions => {
         });
     }
 }).catch(console.error);
-
-window.electronAPI.onDownloadProgress((data) => {
-    console.log('Download progress:', data);
-});
-
-
-// ===== AUTO-UPDATE LOGIC =====
 const updateNotif = document.getElementById('update-notification');
 const updateSub = document.getElementById('update-sub');
 const restartBtn = document.getElementById('restart-button');
-
 window.electronAPI.onUpdateAvailable(() => {
     updateNotif.classList.remove('hidden');
-    updateSub.textContent = 'Downloading the latest version...';
+    updateSub.textContent = 'Downloading update...';
 });
-
 window.electronAPI.onUpdateDownloaded(() => {
-    updateSub.textContent = 'Update downloaded and ready to install.';
+    updateSub.textContent = 'Update ready.';
     restartBtn.classList.remove('hidden');
 });
-
 restartBtn.addEventListener('click', () => {
     window.electronAPI.restartApp();
 });

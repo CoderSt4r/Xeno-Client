@@ -9,7 +9,6 @@
     <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 </head>
 <body>
-    <!-- Custom Titlebar -->
     <div class="titlebar">
         <div class="titlebar-drag"></div>
         <div class="titlebar-controls">
@@ -17,9 +16,7 @@
             <button id="close-btn" class="ctrl danger"><i class="ph ph-x"></i></button>
         </div>
     </div>
-
     <div class="login-layout">
-        <!-- Left Panel: Branding -->
         <div class="brand-panel">
             <div class="brand-content">
                 <div class="logo-mark">
@@ -36,23 +33,16 @@
             </div>
             <div class="brand-version">v1.0.0 Beta</div>
         </div>
-
-        <!-- Right Panel: Auth Forms -->
         <div class="auth-panel">
             <div class="auth-box">
-                <!-- Tabs -->
                 <div class="auth-tabs">
                     <button class="auth-tab active" id="tab-login">Sign In</button>
                     <button class="auth-tab" id="tab-register">Create Account</button>
                 </div>
-
-                <!-- Error banner -->
                 <div class="auth-error hidden" id="auth-error">
                     <i class="ph ph-warning"></i>
                     <span id="auth-error-msg">Something went wrong.</span>
                 </div>
-
-                <!-- Login Form -->
                 <form class="auth-form active" id="form-login" autocomplete="off">
                     <div class="field-group">
                         <label>Username</label>
@@ -80,8 +70,6 @@
                         <i class="ph ph-arrow-right"></i>
                     </button>
                 </form>
-
-                <!-- Register Form -->
                 <form class="auth-form" id="form-register" autocomplete="off">
                     <div class="field-group">
                         <label>Display Name</label>
@@ -123,14 +111,12 @@
                         <i class="ph ph-user-plus"></i>
                     </button>
                 </form>
-
                 <div class="auth-footer">
                     Accounts are stored locally. Online sync coming soon.
                 </div>
             </div>
         </div>
     </div>
-
     <script src="login.js"></script>
 </body>
 </html>
