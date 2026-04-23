@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XenoClient — Minecraft Launcher</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+</head>
+
+<body>
+    <!-- Custom Titlebar -->
+    <div class="titlebar" id="titlebar">
+        <div class="titlebar-left">
+            <div class="app-logo">
+                <i class="ph-fill ph-cube"></i>
+            </div>
+            <span class="app-name">XenoClient</span>
+        </div>
+        <div class="titlebar-drag-region"></div>
+        <div class="titlebar-controls">
+            <button id="minimize-btn" class="ctrl-btn"><i class="ph ph-minus"></i></button>
+            <button id="maximize-btn" class="ctrl-btn"><i class="ph ph-square"></i></button>
+            <button id="close-btn" class="ctrl-btn danger"><i class="ph ph-x"></i></button>
+        </div>
+    </div>
+
+    <div class="main-layout">
+        <!-- Icon Sidebar -->
+        <nav class="icon-sidebar">
+            <div class="sidebar-top">
+                <button class="nav-icon active" data-page="home" title="Home">
+                    <i class="ph-fill ph-house"></i>
+                </button>
+                <button class="nav-icon" data-page="profiles" title="Profiles">
+                    <i class="ph-fill ph-stack"></i>
+                </button>
+                <button class="nav-icon" data-page="mods" title="Mod Browser">
+                    <i class="ph-fill ph-puzzle-piece"></i>
+                </button>
+                <button class="nav-icon" data-page="library" title="My Library">
+                    <i class="ph-fill ph-books"></i>
+                </button>
+                <button class="nav-icon" data-page="social" title="Players">
+                    <i class="ph-fill ph-users"></i>
+                </button>
+            </div>
+            <div class="sidebar-bottom">
+                <button class="nav-icon" data-page="settings" title="Settings">
+                    <i class="ph ph-gear-six"></i>
+                </button>
+                <div class="user-avatar" id="sidebar-avatar" title="Account" data-page="social">
+                    <i class="ph ph-user"></i>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Page Content -->
+        <div class="page-container">
+
+            <!-- ===== HOME PAGE ===== -->
+            <div class="page active" id="page-home">
+                <div class="home-layout">
+                    <div class="home-main">
+                        <div class="home-header">
+                            <h1>Welcome back, <span id="home-username" class="accent-text">Player</span></h1>
+                            <p class="subtitle">Jump back in or explore something new.</p>
+                        </div>
+
+                        <!-- Active Profile Launch Card -->
+                        <div class="active-profile-card" id="active-profile-card">
+                            <div class="profile-card-icon">
+                                <i class="ph-fill ph-cube-focus"></i>
+                            </div>
+                            <div class="profile-card-info">
+                                <div class="profile-card-name" id="active-profile-name">Vanilla 1.20.1</div>
+                                <div class="profile-card-meta">
+                                    <span class="meta-chip" id="active-profile-version"><i class="ph ph-tag"></i>
+                                        1.20.1</span>
+                                    <span class="meta-chip" id="active-profile-type"><i class="ph ph-cube"></i>
+                                        Vanilla</span>
+                                    <span class="meta-chip" id="active-profile-mods"><i class="ph ph-puzzle-piece"></i>
+                                        0 mods</span>
+                                </div>
+                                <div class="launch-status-area">
+                                    <p id="launch-status-text">Ready to play</p>
+                                    <div class="progress-track hidden" id="launch-progress-track">
+                                        <div class="progress-fill" id="launch-progress-fill"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="profile-card-actions">
+                                <button class="btn-secondary" id="change-profile-btn">
+                                    <i class="ph ph-arrows-clockwise"></i> Switch
+                                </button>
+                                <button class="btn-launch" id="launch-btn">
+                                    <i class="ph-fill ph-play"></i> Play
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Recent Profiles -->
+                        <div class="section">
+                            <div class="section-header">
+                                <h2>Your Profiles</h2>
+                                <button class="btn-link" id="new-profile-shortcut-btn"><i class="ph ph-plus"></i>
+                                    New</button>
+                            </div>
+                            <div class="profiles-list" id="home-profiles-list">
+                                <!-- Populated by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="home-sidebar">
+                        <div class="sidebar-card account-card">
+                            <div class="sidebar-card-title">Playing as</div>
+                            <div class="account-display" id="home-account-display">
+                                <div class="account-avatar"><i class="ph ph-user"></i></div>
+                                <div class="account-info">
+                                    <div class="account-name" id="home-account-name">Player</div>
+                                    <div class="account-type" id="home-account-type">Offline</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="sidebar-card news-card">
+                            <div class="sidebar-card-title">Quick Links</div>
+                            <a class="news-link" href="#" id="link-modrinth"><i class="ph ph-puzzle-piece"></i> Browse
+                                Mods</a>
+                            <a class="news-link" href="#" id="link-settings"><i class="ph ph-gear-six"></i> Settings</a>
+                            <a class="news-link" href="#" id="link-new-profile"><i class="ph ph-plus-circle"></i> Create
+                                Profile</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== PROFILES PAGE ===== -->
+            <div class="page" id="page-profiles">
+                <div class="page-header">
+                    <div>
+                        <h1>Profiles</h1>
+                        <p class="subtitle">Manage your Minecraft instances.</p>
+                    </div>
+                    <button class="btn-primary" id="create-profile-btn">
+                        <i class="ph ph-plus"></i> Create Profile
+                    </button>
+                </div>
+
+                <div class="profiles-grid" id="profiles-grid">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+
+            <!-- ===== MOD BROWSER PAGE ===== -->
+            <div class="page" id="page-mods">
+                <div class="page-header">
+                    <div>
+                        <h1>Mod Browser</h1>
+                        <p class="subtitle">Powered by Modrinth API - browse and install mods.</p>
+                    </div>
+                </div>
+                <div class="mod-browser-controls">
+                    <div class="search-bar">
+                        <i class="ph ph-magnifying-glass"></i>
+                        <input type="text" id="mod-search-input" placeholder="Search mods, shaders, resource packs...">
+                    </div>
+                    <div class="filter-row">
+                        <select id="mod-category-filter" class="select-input">
+                            <option value="">All Categories</option>
+                            <option value="optimization">Optimization</option>
+                            <option value="utility">Utility</option>
+                            <option value="adventure">Adventure</option>
+                            <option value="technology">Technology</option>
+                            <option value="magic">Magic</option>
+                            <option value="storage">Storage</option>
+                            <option value="food">Food</option>
+                            <option value="combat">Combat</option>
+                        </select>
+                        <select id="mod-loader-filter" class="select-input">
+                            <option value="">All Loaders</option>
+                            <option value="fabric">Fabric</option>
+                            <option value="forge">Forge</option>
+                            <option value="quilt">Quilt</option>
+                            <option value="neoforge">NeoForge</option>
+                        </select>
+                        <select id="mod-version-filter" class="select-input">
+                            <option value="">All Versions</option>
+                            <option value="1.21.1">1.21.1</option>
+                            <option value="1.20.1">1.20.1</option>
+                            <option value="1.19.4">1.19.4</option>
+                            <option value="1.18.2">1.18.2</option>
+                            <option value="1.16.5">1.16.5</option>
+                            <option value="1.12.2">1.12.2</option>
+                            <option value="1.8.9">1.8.9</option>
+                        </select>
+                        <select id="mod-sort-filter" class="select-input">
+                            <option value="relevance">Relevance</option>
+                            <option value="downloads">Most Downloaded</option>
+                            <option value="follows">Most Followed</option>
+                            <option value="newest">Newest</option>
+                            <option value="updated">Recently Updated</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="mods-grid" id="mods-grid">
+                    <div class="loading-state" id="mods-loading">
+                        <div class="spinner"></div>
+                        <p>Fetching mods from Modrinth...</p>
+                    </div>
+                </div>
+                <div class="pagination" id="mod-pagination">
+                    <button class="btn-secondary" id="mods-prev-btn" disabled><i class="ph ph-arrow-left"></i>
+                        Prev</button>
+                    <span id="page-indicator">Page 1</span>
+                    <button class="btn-secondary" id="mods-next-btn"><i class="ph ph-arrow-right"></i> Next</button>
+                </div>
+            </div>
+
+            <!-- ===== LIBRARY PAGE ===== -->
+            <div class="page" id="page-library">
+                <div class="page-header">
+                    <div>
+                        <h1>My Library</h1>
+                        <p class="subtitle">Mods installed across your profiles.</p>
+                    </div>
+                    <select id="library-profile-select" class="select-input"></select>
+                </div>
+                <div class="installed-mods-list" id="installed-mods-list">
+                    <div class="empty-state">
+                        <i class="ph ph-puzzle-piece"></i>
+                        <p>No mods installed yet. Browse the Mod Browser to add some!</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ===== SETTINGS PAGE ===== -->
+            <div class="page" id="page-settings">
+                <div class="page-header">
+                    <div>
+                        <h1>Settings</h1>
+                        <p class="subtitle">Configure your launcher experience.</p>
+                    </div>
+                </div>
+
+                <div class="settings-layout">
+                    <nav class="settings-tabs">
+                        <button class="settings-tab active" data-tab="account">
+                            <i class="ph ph-user"></i> Account
+                        </button>
+                        <button class="settings-tab" data-tab="java">
+                            <i class="ph ph-cpu"></i> Java & Performance
+                        </button>
+                        <button class="settings-tab" data-tab="launcher">
+                            <i class="ph ph-sliders"></i> Launcher
+                        </button>
+                    </nav>
+
+                    <div class="settings-content">
+                        <!-- Account Tab -->
+                        <div class="settings-panel active" id="tab-account">
+                            <div class="settings-section">
+                                <h3>Account Type</h3>
+                                <div class="account-type-selector">
+                                    <label class="account-type-card" id="offline-type-card">
+                                        <input type="radio" name="account-type" value="offline" id="type-offline"
+                                            checked>
+                                        <div class="type-card-content">
+                                            <i class="ph ph-user"></i>
+                                            <div>
+                                                <div class="type-name">Offline / Cracked</div>
+                                                <div class="type-desc">Play on cracked servers with any username</div>
+                                            </div>
+                                        </div>
+                                    </label>
+                                    <label class="account-type-card" id="ms-type-card">
+                                        <input type="radio" name="account-type" value="microsoft" id="type-microsoft">
+                                        <div class="type-card-content">
+                                            <i class="ph-fill ph-microsoft-teams-logo"></i>
+                                            <div>
+                                                <div class="type-name">Microsoft (Premium)</div>
+                                                <div class="type-desc">Use your real Minecraft account for premium
+                                                    servers</div>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="settings-section" id="offline-section">
+                                <h3>Offline Username</h3>
+                                <div class="input-row">
+                                    <input type="text" class="text-input" id="username-input"
+                                        placeholder="Your ingame name">
+                                </div>
+                            </div>
+
+                            <div class="settings-section hidden" id="microsoft-section">
+                                <h3>Microsoft Account</h3>
+                                <div class="ms-account-status" id="ms-account-status">
+                                    <div class="ms-status-icon"><i class="ph ph-sign-in"></i></div>
+                                    <div class="ms-status-info">
+                                        <div id="ms-status-name">Not logged in</div>
+                                        <div id="ms-status-sub">Click the button to sign in with Microsoft</div>
+                                    </div>
+                                    <button class="btn-primary" id="ms-login-btn">Sign In</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Java & Performance Tab -->
+                        <div class="settings-panel" id="tab-java">
+                            <div class="settings-section">
+                                <h3>Java Path</h3>
+                                <p class="section-desc">Leave blank to use the system default Java installation.</p>
+                                <div class="input-row">
+                                    <input type="text" class="text-input" id="java-path-input"
+                                        placeholder="/usr/bin/java">
+                                </div>
+                            </div>
+                            <div class="settings-section">
+                                <h3>RAM Allocation</h3>
+                                <p class="section-desc">Set how much memory is dedicated to Minecraft.</p>
+                                <div class="slider-group">
+                                    <div class="slider-row">
+                                        <label>Minimum RAM</label>
+                                        <span id="ram-min-val" class="slider-val">2 GB</span>
+                                    </div>
+                                    <input type="range" class="slider" id="ram-min-input" min="512" max="8192"
+                                        step="512" value="2048">
+                                </div>
+                                <div class="slider-group">
+                                    <div class="slider-row">
+                                        <label>Maximum RAM</label>
+                                        <span id="ram-max-val" class="slider-val">4 GB</span>
+                                    </div>
+                                    <input type="range" class="slider" id="ram-max-input" min="1024" max="32768"
+                                        step="512" value="4096">
+                                </div>
+                            </div>
+                            <div class="settings-section">
+                                <h3>JVM Arguments</h3>
+                                <p class="section-desc">Extra flags passed to the JVM. Useful for GC tuning.</p>
+                                <textarea class="text-input textarea-input" id="jvm-args-input"
+                                    placeholder="-XX:+UseG1GC -XX:+ParallelRefProcEnabled -XX:MaxGCPauseMillis=200"></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Launcher Tab -->
+                        <div class="settings-panel" id="tab-launcher">
+                            <div class="settings-section">
+                                <h3>Game Window Resolution</h3>
+                                <div class="input-pair">
+                                    <div class="input-row">
+                                        <label>Width</label>
+                                        <input type="number" class="text-input" id="res-width-input" value="1280"
+                                            placeholder="1280">
+                                    </div>
+                                    <div class="input-row">
+                                        <label>Height</label>
+                                        <input type="number" class="text-input" id="res-height-input" value="720"
+                                            placeholder="720">
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="settings-section">
+                                <h3>Launcher Behaviour</h3>
+                                <div class="toggle-group">
+                                    <label class="toggle-row">
+                                        <div class="toggle-info">
+                                            <span>Hide launcher on game launch</span>
+                                            <small>Minimizes XenoClient when you click Play</small>
+                                        </div>
+                                        <div class="toggle-switch">
+                                            <input type="checkbox" id="toggle-hide-launcher" checked>
+                                            <span class="toggle-thumb"></span>
+                                        </div>
+                                    </label>
+                                    <label class="toggle-row">
+                                        <div class="toggle-info">
+                                            <span>Close launcher on game launch</span>
+                                            <small>Fully closes XenoClient instead of minimizing</small>
+                                        </div>
+                                        <div class="toggle-switch">
+                                            <input type="checkbox" id="toggle-close-launcher">
+                                            <span class="toggle-thumb"></span>
+                                        </div>
+                                    </label>
+                                    <label class="toggle-row">
+                                        <div class="toggle-info">
+                                            <span>Restore launcher when game closes</span>
+                                            <small>Bring XenoClient back after you exit Minecraft</small>
+                                        </div>
+                                        <div class="toggle-switch">
+                                            <input type="checkbox" id="toggle-restore-launcher" checked>
+                                            <span class="toggle-thumb"></span>
+                                        </div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="settings-footer">
+                    <button class="btn-primary" id="save-settings-btn">
+                        <i class="ph ph-floppy-disk"></i> Save Settings
+                    </button>
+                    <span id="settings-saved-msg" class="saved-msg hidden">✓ Settings saved!</span>
+                </div>
+            </div>
+
+
+            <!-- ===== SOCIAL PAGE ===== -->
+            <div class="page" id="page-social">
+                <div class="page-header">
+                    <div>
+                        <h1>Players</h1>
+                        <p class="subtitle">Your profile and find other Minecraft players.</p>
+                    </div>
+                </div>
+                <div class="my-profile-card glass-card" id="my-profile-card">
+                    <div class="my-profile-skin">
+                        <div class="skin-render" id="my-skin-render">
+                            <i class="ph ph-user" style="font-size:48px;color:var(--text3)"></i>
+                        </div>
+                    </div>
+                    <div class="my-profile-info">
+                        <div class="profile-username" id="my-profile-username">Loading...</div>
+                        <div class="profile-subtitle">XenoClient Player</div>
+                        <div class="profile-stats-row">
+                            <div class="profile-stat-item"><div class="stat-val" id="stat-profiles">0</div><div class="stat-key">Profiles</div></div>
+                            <div class="profile-stat-item"><div class="stat-val" id="stat-mods">0</div><div class="stat-key">Mods Installed</div></div>
+                            <div class="profile-stat-item"><div class="stat-val" id="stat-member-since">-</div><div class="stat-key">Member Since</div></div>
+                        </div>
+                        <div class="mc-link-section">
+                            <div class="mc-link-label">Linked Minecraft Account</div>
+                            <div class="mc-link-row">
+                                <div class="mc-link-info" id="mc-link-info"><i class="ph ph-link-break"></i> Not linked</div>
+                                <button class="btn-secondary btn-sm" id="link-mc-btn"><i class="ph ph-link"></i> Link Account</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="section" style="margin-top:28px;">
+                    <div class="section-header"><h2>Search Players</h2></div>
+                    <div class="player-search-bar">
+                        <div class="search-bar" style="margin-bottom:0;flex:1;">
+                            <i class="ph ph-magnifying-glass"></i>
+                            <input type="text" id="player-search-input" placeholder="Search by Minecraft username...">
+                        </div>
+                        <button class="btn-primary" id="player-search-btn"><i class="ph ph-magnifying-glass"></i> Search</button>
+                    </div>
+                </div>
+                <div id="player-results" class="player-results"></div>
+                <div class="mc-overlay hidden" id="mc-link-overlay">
+                    <div class="mc-overlay-box glass-card">
+                        <div class="mc-overlay-header">
+                            <h3>Link Minecraft Account</h3>
+                            <button class="modal-close" id="close-mc-link"><i class="ph ph-x"></i></button>
+                        </div>
+                        <p style="color:var(--text2);font-size:13px;margin-bottom:16px;">Enter your Minecraft username to link it to your XenoClient profile.</p>
+                        <div class="search-bar" style="margin-bottom:12px;"><i class="ph ph-cube"></i><input type="text" id="mc-link-input" placeholder="Your Minecraft username"></div>
+                        <div class="mc-link-preview hidden" id="mc-link-preview">
+                            <img id="mc-link-avatar" src="" alt="" style="width:48px;height:48px;border-radius:8px;border:1px solid var(--border)">
+                            <div><div id="mc-link-found-name" style="font-weight:700;"></div><div id="mc-link-found-uuid" style="font-size:11px;color:var(--text2);"></div></div>
+                        </div>
+                        <div class="mc-link-err hidden" id="mc-link-err"></div>
+                        <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:12px;">
+                            <button class="btn-secondary" id="mc-lookup-btn"><i class="ph ph-magnifying-glass"></i> Look Up</button>
+                            <button class="btn-primary hidden" id="mc-confirm-btn"><i class="ph ph-check"></i> Confirm</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== MODALS ===== -->
+
+    <!-- Create/Edit Profile Modal -->
+    <div class="modal-backdrop hidden" id="profile-modal-backdrop">
+        <div class="modal" id="profile-modal">
+            <div class="modal-header">
+                <h2 id="profile-modal-title">Create Profile</h2>
+                <button class="modal-close" id="close-profile-modal"><i class="ph ph-x"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Profile Name</label>
+                    <input type="text" class="text-input" id="profile-name-input" placeholder="My Modded Instance">
+                </div>
+                <div class="form-group">
+                    <label>Minecraft Version</label>
+                    <select class="select-input full-width" id="profile-version-input">
+                        <option value="">Loading versions...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Mod Loader</label>
+                    <select class="select-input full-width" id="profile-loader-input">
+                        <option value="vanilla">Vanilla</option>
+                        <option value="fabric">Fabric</option>
+                        <option value="forge">Forge</option>
+                        <option value="quilt">Quilt</option>
+                        <option value="neoforge">NeoForge</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Icon Color</label>
+                    <div class="color-picker" id="profile-color-picker">
+                        <div class="color-swatch active" data-color="#6366f1" style="background:#6366f1;"></div>
+                        <div class="color-swatch" data-color="#ec4899" style="background:#ec4899;"></div>
+                        <div class="color-swatch" data-color="#10b981" style="background:#10b981;"></div>
+                        <div class="color-swatch" data-color="#f59e0b" style="background:#f59e0b;"></div>
+                        <div class="color-swatch" data-color="#06b6d4" style="background:#06b6d4;"></div>
+                        <div class="color-swatch" data-color="#ef4444" style="background:#ef4444;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="cancel-profile-modal">Cancel</button>
+                <button class="btn-primary" id="save-profile-btn">Create Profile</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mod Detail Modal -->
+    <div class="modal-backdrop hidden" id="mod-modal-backdrop">
+        <div class="modal mod-modal" id="mod-modal">
+            <div class="modal-header">
+                <div class="mod-modal-title-area">
+                    <div class="mod-modal-icon" id="mod-modal-icon"></div>
+                    <div>
+                        <h2 id="mod-modal-name"></h2>
+                        <p id="mod-modal-author"></p>
+                    </div>
+                </div>
+                <button class="modal-close" id="close-mod-modal"><i class="ph ph-x"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="mod-modal-stats">
+                    <div class="mod-stat"><i class="ph ph-download-simple"></i><span id="mod-modal-downloads"></span>
+                    </div>
+                    <div class="mod-stat"><i class="ph ph-heart"></i><span id="mod-modal-followers"></span></div>
+                    <div class="mod-stat"><i class="ph ph-calendar"></i><span id="mod-modal-updated"></span></div>
+                </div>
+                <p id="mod-modal-desc"></p>
+                <div class="mod-modal-chips">
+                    <div class="chips-row" id="mod-modal-loaders"></div>
+                    <div class="chips-row" id="mod-modal-versions"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="close-mod-modal-btn">Close</button>
+                <div class="install-area">
+                    <select id="mod-install-profile" class="select-input"></select>
+                    <button class="btn-primary" id="install-mod-btn">
+                        <i class="ph ph-download-simple"></i> Add to Profile
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Update Notification -->
+    <div id="update-notification" class="hidden">
+        <div class="update-content">
+            <i class="ph-fill ph-arrow-circle-up"></i>
+            <div class="update-text">
+                <p id="update-msg">A new update is available!</p>
+                <p class="update-subtext" id="update-sub">Downloading update...</p>
+            </div>
+            <button id="restart-button" class="btn-primary btn-sm hidden">Restart to Update</button>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+
+</html>

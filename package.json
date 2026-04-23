@@ -1,0 +1,58 @@
+{
+  "name": "xenoclient",
+  "version": "1.0.0",
+  "description": "Advanced Minecraft Launcher",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron . --no-sandbox",
+    "build": "mkdir -p build-pack && cp -r main.js renderer.js login.js preload.js index.html login.html styles.css package.json node_modules build/icon.png build-pack/ && javascript-obfuscator build-pack/main.js build-pack/renderer.js build-pack/login.js build-pack/preload.js --output build-pack --rename-globals true --string-array true --string-array-encoding 'base64' --string-array-threshold 1 && electron-builder build --project build-pack --publish never",
+    "release": "mkdir -p build-pack && cp -r main.js renderer.js login.js preload.js index.html login.html styles.css package.json node_modules build/icon.png build-pack/ && javascript-obfuscator build-pack/main.js build-pack/renderer.js build-pack/login.js build-pack/preload.js --output build-pack --rename-globals true --string-array true --string-array-encoding 'base64' --string-array-threshold 1 && electron-builder build --project build-pack --publish always"
+  },
+  "build": {
+    "appId": "com.xeno.client",
+    "productName": "XenoClient",
+    "copyright": "Copyright © 2024 Xeno",
+    "directories": {
+      "output": "dist"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb"
+      ],
+      "category": "Game",
+      "maintainer": "Xeno <contact@xenoclient.com>"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "CoderSt4r",
+        "repo": "Xeno-Client"
+      }
+    ]
+  },
+  "keywords": [],
+  "author": {
+    "name": "Xeno",
+    "email": "contact@xenoclient.com"
+  },
+  "homepage": "https://xenoclient.com",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^41.3.0",
+    "electron-builder": "^26.8.1",
+    "electron-updater": "^6.8.3",
+    "javascript-obfuscator": "^5.4.1"
+  },
+  "dependencies": {
+    "extract-zip": "^2.0.1",
+    "minecraft-launcher-core": "^3.18.2",
+    "msmc": "^5.0.5",
+    "node-fetch": "^2.7.0"
+  }
+}

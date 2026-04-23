@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>XenoClient</title>
+    <link rel="stylesheet" href="login.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+</head>
+<body>
+    <!-- Custom Titlebar -->
+    <div class="titlebar">
+        <div class="titlebar-drag"></div>
+        <div class="titlebar-controls">
+            <button id="min-btn" class="ctrl"><i class="ph ph-minus"></i></button>
+            <button id="close-btn" class="ctrl danger"><i class="ph ph-x"></i></button>
+        </div>
+    </div>
+
+    <div class="login-layout">
+        <!-- Left Panel: Branding -->
+        <div class="brand-panel">
+            <div class="brand-content">
+                <div class="logo-mark">
+                    <i class="ph-fill ph-cube"></i>
+                </div>
+                <h1 class="brand-name">XenoClient</h1>
+                <p class="brand-tagline">Your advanced Minecraft launcher.</p>
+                <div class="brand-features">
+                    <div class="feature-item"><i class="ph-fill ph-puzzle-piece"></i> Modrinth mod browser</div>
+                    <div class="feature-item"><i class="ph-fill ph-stack"></i> Multi-profile support</div>
+                    <div class="feature-item"><i class="ph-fill ph-shield-check"></i> Microsoft auth</div>
+                    <div class="feature-item"><i class="ph-fill ph-download-simple"></i> Auto-downloads Java</div>
+                </div>
+            </div>
+            <div class="brand-version">v1.0.0 Beta</div>
+        </div>
+
+        <!-- Right Panel: Auth Forms -->
+        <div class="auth-panel">
+            <div class="auth-box">
+                <!-- Tabs -->
+                <div class="auth-tabs">
+                    <button class="auth-tab active" id="tab-login">Sign In</button>
+                    <button class="auth-tab" id="tab-register">Create Account</button>
+                </div>
+
+                <!-- Error banner -->
+                <div class="auth-error hidden" id="auth-error">
+                    <i class="ph ph-warning"></i>
+                    <span id="auth-error-msg">Something went wrong.</span>
+                </div>
+
+                <!-- Login Form -->
+                <form class="auth-form active" id="form-login" autocomplete="off">
+                    <div class="field-group">
+                        <label>Username</label>
+                        <div class="input-wrap">
+                            <i class="ph ph-user"></i>
+                            <input type="text" id="login-username" placeholder="Enter your username" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="field-group">
+                        <label>Password</label>
+                        <div class="input-wrap">
+                            <i class="ph ph-lock"></i>
+                            <input type="password" id="login-password" placeholder="Enter your password">
+                            <button type="button" class="toggle-pw" id="toggle-login-pw">
+                                <i class="ph ph-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <label class="remember-row">
+                        <input type="checkbox" id="login-remember">
+                        <span>Remember me</span>
+                    </label>
+                    <button type="submit" class="btn-auth" id="login-btn">
+                        <span>Sign In</span>
+                        <i class="ph ph-arrow-right"></i>
+                    </button>
+                </form>
+
+                <!-- Register Form -->
+                <form class="auth-form" id="form-register" autocomplete="off">
+                    <div class="field-group">
+                        <label>Display Name</label>
+                        <div class="input-wrap">
+                            <i class="ph ph-user"></i>
+                            <input type="text" id="reg-username" placeholder="Choose a username" autocomplete="off">
+                        </div>
+                    </div>
+                    <div class="field-group">
+                        <label>Email</label>
+                        <div class="input-wrap">
+                            <i class="ph ph-envelope"></i>
+                            <input type="email" id="reg-email" placeholder="your@email.com">
+                        </div>
+                    </div>
+                    <div class="field-group">
+                        <label>Password</label>
+                        <div class="input-wrap">
+                            <i class="ph ph-lock"></i>
+                            <input type="password" id="reg-password" placeholder="At least 8 characters">
+                            <button type="button" class="toggle-pw" id="toggle-reg-pw">
+                                <i class="ph ph-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="field-group">
+                        <label>Confirm Password</label>
+                        <div class="input-wrap">
+                            <i class="ph ph-lock-key"></i>
+                            <input type="password" id="reg-confirm" placeholder="Repeat your password">
+                        </div>
+                    </div>
+                    <div class="password-strength hidden" id="pw-strength">
+                        <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+                        <span id="strength-label">Weak</span>
+                    </div>
+                    <button type="submit" class="btn-auth" id="register-btn">
+                        <span>Create Account</span>
+                        <i class="ph ph-user-plus"></i>
+                    </button>
+                </form>
+
+                <div class="auth-footer">
+                    Accounts are stored locally. Online sync coming soon.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="login.js"></script>
+</body>
+</html>
