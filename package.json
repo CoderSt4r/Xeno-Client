@@ -1,12 +1,12 @@
 {
   "name": "xenoclient",
-  "version": "1.0.11",
+  "version": "1.0.13",
   "description": "Advanced Minecraft Launcher",
   "main": "main.js",
   "scripts": {
     "start": "electron . --no-sandbox",
-    "build": "mkdir -p build-pack/build && cp -r main.js renderer.js login.js preload.js index.html login.html styles.css login.css package.json node_modules build-pack/ && cp build/icon.png build-pack/build/ && javascript-obfuscator build-pack/main.js build-pack/renderer.js build-pack/login.js build-pack/preload.js --output build-pack --rename-globals true --string-array true --string-array-encoding base64 --string-array-threshold 1 && electron-builder build --project build-pack --publish never",
-    "release": "mkdir -p build-pack/build && cp -r main.js renderer.js login.js preload.js index.html login.html styles.css login.css package.json node_modules build-pack/ && cp build/icon.png build-pack/build/ && javascript-obfuscator build-pack/main.js build-pack/renderer.js build-pack/login.js build-pack/preload.js --output build-pack --rename-globals true --string-array true --string-array-encoding base64 --string-array-threshold 1 && electron-builder build --project build-pack --publish always"
+    "build": "node build-script.js && javascript-obfuscator build-pack/main.js build-pack/renderer.js build-pack/login.js build-pack/preload.js --output build-pack --rename-globals true --string-array true --string-array-encoding base64 --string-array-threshold 1 && electron-builder build --project build-pack --publish never",
+    "release": "node build-script.js && javascript-obfuscator build-pack/main.js build-pack/renderer.js build-pack/login.js build-pack/preload.js --output build-pack --rename-globals true --string-array true --string-array-encoding base64 --string-array-threshold 1 && electron-builder build --project build-pack --publish always"
   },
   "build": {
     "appId": "com.xeno.client",
