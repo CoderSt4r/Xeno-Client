@@ -5,8 +5,8 @@
   "main": "main.js",
   "scripts": {
     "start": "electron . --no-sandbox",
-    "build": "mkdir -p build-pack && cp -r main.js renderer.js login.js preload.js index.html login.html styles.css login.css assets package.json node_modules build/icon.png build-pack/ && javascript-obfuscator build-pack/main.js build-pack/renderer.js build-pack/login.js build-pack/preload.js --output build-pack --rename-globals true --string-array true --string-array-encoding base64 --string-array-threshold 1 && electron-builder build --project build-pack --publish never",
-    "release": "mkdir -p build-pack && cp -r main.js renderer.js login.js preload.js index.html login.html styles.css login.css assets package.json node_modules build/icon.png build-pack/ && javascript-obfuscator build-pack/main.js build-pack/renderer.js build-pack/login.js build-pack/preload.js --output build-pack --rename-globals true --string-array true --string-array-encoding base64 --string-array-threshold 1 && electron-builder build --project build-pack --publish always"
+    "build": "mkdir -p build-pack && cp -r main.js renderer.js login.js preload.js index.html login.html styles.css login.css package.json node_modules build/icon.png build-pack/ && javascript-obfuscator build-pack/main.js build-pack/renderer.js build-pack/login.js build-pack/preload.js --output build-pack --rename-globals true --string-array true --string-array-encoding base64 --string-array-threshold 1 && electron-builder build --project build-pack --publish never",
+    "release": "mkdir -p build-pack && cp -r main.js renderer.js login.js preload.js index.html login.html styles.css login.css package.json node_modules build/icon.png build-pack/ && javascript-obfuscator build-pack/main.js build-pack/renderer.js build-pack/login.js build-pack/preload.js --output build-pack --rename-globals true --string-array true --string-array-encoding base64 --string-array-threshold 1 && electron-builder build --project build-pack --publish always"
   },
   "build": {
     "appId": "com.xeno.client",
