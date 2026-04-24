@@ -253,12 +253,14 @@ async function fetchMods() {
     if (loader) facetList.push([`categories:${loader}`]);
     if (ver) facetList.push([`versions:${ver}`]);
     
-    const facetStr = encodeURIComponent(JSON.stringify(facetList));
-    const url = `https://api.modrinth.com/v2/project/search?query=${q}&facets=${facetStr}&limit=20&offset=${offset}&index=${sort}`;
-    
     try {
-        const res = await fetch(url, { headers: { 'User-Agent': 'XenoClient/1.0' } });
-        const data = await res.json();
+        const data = await window.electronAPI.searchMods({
+            query: q,
+            facets: facetList,
+            limit: 20,
+            offset: offset,
+            index: sort
+        });
         renderMods(data.hits || []);
         document.getElementById('page-indicator').textContent = `Page ${currentModPage + 1}`;
         document.getElementById('mods-prev-btn').disabled = currentModPage === 0;
@@ -467,7 +469,9 @@ async function fetchMojang(username) {
     return res.json();
 }
 function skinUrl(uuid, type = 'avatars', size = 80) {
-    return `${CRAFATAR}/${type}/${uuid}?size=${size}&overlay=true&default=MHF_Steve`;
+    const param = type.includes('render') ? 'scale' : 'size';
+    const val = param === 'scale' ? Math.max(1, Math.min(10, Math.round(size / 40))) : size;
+    return `${CRAFATAR}/${type}/${uuid}?${param}=${val}&overlay=true&default=MHF_Steve`;
 }
 function renderSocialPage() {
     const session = xcSession;

@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     msLogin: () => ipcRenderer.send('ms-login'),
     onMsLogin: (cb) => ipcRenderer.on('ms-login-reply', (_e, v) => cb(v)),
     getVersions: () => ipcRenderer.invoke('get-versions'),
+    searchMods: (opts) => ipcRenderer.invoke('search-mods', opts),
     downloadMod: (opts) => ipcRenderer.invoke('download-mod', opts),
     onDownloadProgress: (cb) => ipcRenderer.on('download-progress', (_e, v) => cb(v)),
     onSession: (cb) => ipcRenderer.on('session-data', (_e, v) => cb(v)),

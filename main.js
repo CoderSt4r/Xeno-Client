@@ -53,8 +53,9 @@ async function downloadFile(url, dest) {
 async function httpsGet(url) {
     return new Promise((resolve, reject) => {
         const follow = (u) => {
-            https.get(u, { headers: { 'User-Agent': 'XenoClient/1.0' } }, (res) => {
+            https.get(u, { headers: { 'User-Agent': 'XenoClient/1.0 (https://github.com/CoderSt4r/Xeno-Client)' } }, (res) => {
                 if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) return follow(res.headers.location);
+                if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode} for ${u}`));
                 let data = '';
                 res.on('data', c => data += c);
                 res.on('end', () => resolve(data));
@@ -115,6 +116,17 @@ ipcMain.handle('get-versions', async () => {
         return filtered.map(v => ({ id: v.id, type: v.type }));
     } catch (e) {
         return [];
+    }
+});
+ipcMain.handle('search-mods', async (event, { query, facets, offset, limit, index }) => {
+    try {
+        const facetStr = encodeURIComponent(JSON.stringify(facets));
+        const url = `https://api.modrinth.com/v2/search?query=${encodeURIComponent(query)}&facets=${facetStr}&offset=${offset}&limit=${limit}&index=${index}`;
+        const raw = await httpsGet(url);
+        return JSON.parse(raw);
+    } catch (e) {
+        console.error('Modrinth search error:', e);
+        throw e;
     }
 });
 ipcMain.handle('download-mod', async (event, { modId, profileName, profileVersion, profileLoader }) => {
