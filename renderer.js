@@ -35,6 +35,7 @@ document.querySelectorAll('.nav-icon[data-page]').forEach(btn => {
         if (btn.dataset.page === 'profiles') renderProfilesPage();
         if (btn.dataset.page === 'mods') { renderModPage(); fetchMods(); }
         if (btn.dataset.page === 'library') renderLibrary();
+        if (btn.dataset.page === 'skins') renderSkinsPage();
         if (btn.dataset.page === 'social') renderSocialPage();
         if (btn.dataset.page === 'settings') loadSettingsUI();
     });
@@ -246,12 +247,15 @@ async function fetchMods() {
     const ver = document.getElementById('mod-version-filter').value;
     const sort = document.getElementById('mod-sort-filter').value;
     const offset = currentModPage * 20;
-    let facets = [];
-    if (cat) facets.push(`["categories:${cat}"]`);
-    if (loader) facets.push(`["categories:${loader}"]`);
-    if (ver) facets.push(`["versions:${ver}"]`);
-    const facetStr = facets.length ? `&facets=[${facets.join(',')}]` : '';
-    const url = `https://api.modrinth.com/v2/project/search?query=${q}&facets=[["project_type:mod"],["categories:${loader}"]]${facetStr}&limit=20&offset=${offset}&index=${sort}`;
+    
+    let facetList = [["project_type:mod"]];
+    if (cat) facetList.push([`categories:${cat}`]);
+    if (loader) facetList.push([`categories:${loader}`]);
+    if (ver) facetList.push([`versions:${ver}`]);
+    
+    const facetStr = encodeURIComponent(JSON.stringify(facetList));
+    const url = `https://api.modrinth.com/v2/project/search?query=${q}&facets=${facetStr}&limit=20&offset=${offset}&index=${sort}`;
+    
     try {
         const res = await fetch(url, { headers: { 'User-Agent': 'XenoClient/1.0' } });
         const data = await res.json();
@@ -260,6 +264,7 @@ async function fetchMods() {
         document.getElementById('mods-prev-btn').disabled = currentModPage === 0;
         document.getElementById('mods-next-btn').disabled = (data.hits||[]).length < 20;
     } catch(e) {
+        console.error('Modrinth fetch error:', e);
         grid.innerHTML = '<div class="loading-state"><i class="ph ph-wifi-slash"></i><p>Connection error.</p></div>';
     }
 }
@@ -520,6 +525,53 @@ function renderSocialPage() {
         }
     };
 }
+function renderSkinsPage() {
+    const linked = JSON.parse(localStorage.getItem('xc-mc-link') || 'null');
+    const previewEl = document.getElementById('current-skin-render');
+    if (linked) {
+        previewEl.innerHTML = `<img src="${skinUrl(linked.id, 'renders/body', 300)}" alt="skin">`;
+    } else {
+        previewEl.innerHTML = '<i class="ph ph-user" style="font-size:64px;color:var(--text3)"></i>';
+    }
+    loadSkinGallery();
+}
+const FEATURED_SKINS = [
+    { name: 'Dream', id: 'ec70bc6c-7473-4c50-bb02-e4421508d208' },
+    { name: 'Technoblade', id: 'b0231908-16e6-42d8-9442-99933758a099' },
+    { name: 'Mumbo Jumbo', id: 'c3562a01-447a-4293-8472-353272f7d391' },
+    { name: 'Grian', id: '0d481f14-04f7-4180-87a7-5f725350325d' },
+    { name: 'DanTDM', id: '71626002-c971-460d-8547-0e6d6232e0e0' },
+    { name: 'CaptainSparklez', id: 'b757e841-f62f-4886-9041-f9c49ca52825' }
+];
+function loadSkinGallery() {
+    const grid = document.getElementById('skin-gallery-grid');
+    grid.innerHTML = '';
+    FEATURED_SKINS.forEach(skin => {
+        const card = document.createElement('div');
+        card.className = 'skin-item-card';
+        card.innerHTML = `
+            <div class="skin-item-preview">
+                <img src="${skinUrl(skin.id, 'renders/body', 150)}" alt="${skin.name}">
+            </div>
+            <div class="skin-item-name">${skin.name}</div>
+        `;
+        card.onclick = () => {
+            document.getElementById('current-skin-render').innerHTML = `<img src="${skinUrl(skin.id, 'renders/body', 300)}" alt="skin">`;
+        };
+        grid.appendChild(card);
+    });
+}
+document.getElementById('upload-skin-btn').onclick = () => document.getElementById('skin-file-input').click();
+document.getElementById('skin-file-input').onchange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            document.getElementById('current-skin-render').innerHTML = `<img src="${event.target.result}" style="image-rendering:pixelated; object-fit:contain; width:80%; height:80%;" alt="skin">`;
+        };
+        reader.readAsDataURL(file);
+    }
+};
 document.getElementById('player-search-btn').addEventListener('click', searchPlayers);
 document.getElementById('player-search-input').addEventListener('keydown', (e) => { if (e.key === 'Enter') searchPlayers(); });
 async function searchPlayers() {

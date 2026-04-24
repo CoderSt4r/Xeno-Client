@@ -39,6 +39,9 @@
                 <button class="nav-icon" data-page="library" title="My Library">
                     <i class="ph-fill ph-books"></i>
                 </button>
+                <button class="nav-icon" data-page="skins" title="Skins">
+                    <i class="ph-fill ph-t-shirt"></i>
+                </button>
                 <button class="nav-icon" data-page="social" title="Players">
                     <i class="ph-fill ph-users"></i>
                 </button>
@@ -210,6 +213,38 @@
                     <div class="empty-state">
                         <i class="ph ph-puzzle-piece"></i>
                         <p>No mods installed yet. Browse the Mod Browser to add some!</p>
+                    </div>
+                </div>
+            </div>
+            <div class="page" id="page-skins">
+                <div class="page-header">
+                    <div>
+                        <h1>Skin Manager</h1>
+                        <p class="subtitle">Change and customize your Minecraft skin.</p>
+                    </div>
+                </div>
+                <div class="skins-layout">
+                    <div class="skin-preview-section glass-card">
+                        <div class="skin-viewer-3d" id="skin-viewer-3d">
+                             <div class="skin-render-large" id="current-skin-render">
+                                <i class="ph ph-user" style="font-size:64px;color:var(--text3)"></i>
+                             </div>
+                        </div>
+                        <div class="skin-actions">
+                            <button class="btn-primary full-width" id="upload-skin-btn" style="width:100%;justify-content:center;">
+                                <i class="ph ph-upload-simple"></i> Upload Skin
+                            </button>
+                            <input type="file" id="skin-file-input" accept="image/png" hidden>
+                            <p class="section-desc" style="text-align:center;margin-top:12px;">Supports Standard and Slim skins.</p>
+                        </div>
+                    </div>
+                    <div class="skin-gallery-section">
+                        <div class="section-header">
+                            <h2>Popular Skins</h2>
+                        </div>
+                        <div class="skin-grid" id="skin-gallery-grid">
+                            <div class="loading-state"><div class="spinner"></div></div>
+                        </div>
                     </div>
                 </div>
             </div>
