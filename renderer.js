@@ -7,7 +7,8 @@ let selectedModData = null;
 let editingProfileId = null;
 let selectedColor = '#6366f1';
 let mcVersions = [];
-let xcSession = JSON.parse(localStorage.getItem('xc-session') || 'null'); 
+let skinViewer = null;
+let currentSkinDataUrl = null;
 if (profiles.length === 0) {
     profiles = [{ id: 'default', name: 'Vanilla 1.20.1', version: '1.20.1', loader: 'vanilla', color: '#6366f1', mods: [] }];
     activeProfileId = 'default';
@@ -461,17 +462,20 @@ document.getElementById('save-settings-btn').addEventListener('click', () => {
     renderHome();
 });
 const MOJANG_API = 'https://api.mojang.com/users/profiles/minecraft/';
-const CRAFATAR = 'https://crafatar.com';
 async function fetchMojang(username) {
     const res = await fetch(MOJANG_API + encodeURIComponent(username));
     if (res.status === 404) return null;
     if (!res.ok) throw new Error('API error');
     return res.json();
 }
-function skinUrl(uuid, type = 'avatars', size = 80) {
-    const param = type.includes('render') ? 'scale' : 'size';
-    const val = param === 'scale' ? Math.max(1, Math.min(10, Math.round(size / 40))) : size;
-    return `${CRAFATAR}/${type}/${uuid}?${param}=${val}&overlay=true&default=MHF_Steve`;
+const MC_HEADS = 'https://mc-heads.net';
+function skinUrl(uuid, type = 'body', size = 150, timestamp = null) {
+    // type can be: avatar, body, head, skin
+    if (type === 'renders/body') type = 'body'; // Fix for previous incorrect usage
+    let url = `https://mc-heads.net/${type}/${uuid}/${size}`;
+    if (type === 'skin') url = `https://mc-heads.net/skin/${uuid}`;
+    if (timestamp) url += `?t=${timestamp}`;
+    return url;
 }
 function renderSocialPage() {
     const session = xcSession;
@@ -488,9 +492,10 @@ function renderSocialPage() {
     const linked = JSON.parse(localStorage.getItem('xc-mc-link') || 'null');
     const linkInfo = document.getElementById('mc-link-info');
     if (linked) {
-        linkInfo.innerHTML = `<img src="${skinUrl(linked.id, 'avatars', 28)}" alt=""> ${linked.name}`;
+        const ts = Date.now();
+        linkInfo.innerHTML = `<img src="${skinUrl(linked.id, 'avatar', 28, ts)}" alt=""> ${linked.name}`;
         linkInfo.classList.add('linked');
-        document.getElementById('my-skin-render').innerHTML = `<img src="${skinUrl(linked.id, 'renders/body', 90)}" alt="skin">`;
+        document.getElementById('my-skin-render').innerHTML = `<img src="${skinUrl(linked.id, 'avatar', 90, ts)}" alt="skin">`;
     } else {
         linkInfo.innerHTML = '<i class="ph ph-link-break"></i> Not linked';
         linkInfo.classList.remove('linked');
@@ -515,7 +520,7 @@ function renderSocialPage() {
         try {
             const data = await fetchMojang(username);
             if (!data) { errEl.textContent = 'Not found.'; errEl.classList.remove('hidden'); return; }
-            document.getElementById('mc-link-avatar').src = skinUrl(data.id, 'avatars', 48);
+            document.getElementById('mc-link-avatar').src = skinUrl(data.id, 'avatar', 48);
             document.getElementById('mc-link-found-name').textContent = data.name;
             document.getElementById('mc-link-found-uuid').textContent = data.id;
             previewEl.classList.remove('hidden'); confirmBtn.classList.remove('hidden');
@@ -529,27 +534,130 @@ function renderSocialPage() {
         }
     };
 }
+function initSkinViewer() {
+    const container = document.getElementById('skin-viewer-3d');
+    if (!container) return;
+    if (skinViewer) return;
+    
+    container.innerHTML = '';
+    skinViewer = new skinview3d.SkinViewer({
+        canvas: document.createElement('canvas'),
+        width: 300,
+        height: 300,
+        alpha: true,
+        preserveDrawingBuffer: true
+    });
+    container.appendChild(skinViewer.canvas);
+    skinViewer.autoRotate = false;
+    skinViewer.autoRotateSpeed = 0.8;
+    
+    container.onmouseenter = () => { if (skinViewer) skinViewer.autoRotate = true; };
+    container.onmouseleave = () => { if (skinViewer) skinViewer.autoRotate = false; };
+}
+
+function loadSkinToViewer(url, save = false) {
+    if (!skinViewer) initSkinViewer();
+    currentSkinDataUrl = url;
+    skinViewer.loadSkin(url).then(() => {
+        if (save) {
+            setTimeout(() => {
+                const thumbnail = skinViewer.canvas.toDataURL('image/png');
+                let skins = JSON.parse(localStorage.getItem('xc-custom-skins') || '[]');
+                if (!skins.find(s => s.id === url)) {
+                    skins.unshift({ name: 'Saved', id: url, icon: thumbnail });
+                    if (skins.length > 12) skins.pop();
+                    localStorage.setItem('xc-custom-skins', JSON.stringify(skins));
+                    loadSkinGallery();
+                }
+            }, 500);
+        }
+    }).catch(e => console.error('Failed to load skin:', e));
+}
+
 function renderSkinsPage() {
     const linked = JSON.parse(localStorage.getItem('xc-mc-link') || 'null');
-    const previewEl = document.getElementById('current-skin-render');
-    if (linked) {
-        previewEl.innerHTML = `<img src="${skinUrl(linked.id, 'renders/body', 300)}" alt="skin">`;
-    } else {
-        previewEl.innerHTML = '<i class="ph ph-user" style="font-size:64px;color:var(--text3)"></i>';
+    
+    // Update login status display
+    const statusEl = document.getElementById('skin-login-status');
+    if (statusEl) {
+        if (settings.accountType === 'microsoft') {
+            statusEl.innerHTML = '<span style="color:#10b981"><i class="ph ph-check-circle"></i> Microsoft Linked</span>';
+        } else {
+            statusEl.innerHTML = '<span style="color:#f97316"><i class="ph ph-warning-circle"></i> Not Linked (Log in to apply)</span>';
+        }
+    }
+
+    try {
+        initSkinViewer();
+        if (!currentSkinDataUrl) {
+            if (linked) {
+                loadSkinToViewer(skinUrl(linked.id, 'skin'));
+            } else {
+                loadSkinToViewer('https://mc-heads.net/skin/ec70bcaf702f4bb8b48d276fa52a780c'); // Default
+            }
+        } else {
+            loadSkinToViewer(currentSkinDataUrl);
+        }
+    } catch (e) {
+        console.error('Skin viewer error:', e);
+        // Fallback placeholder if viewer fails
+        const container = document.getElementById('skin-viewer-3d');
+        if (container) container.innerHTML = '<i class="ph ph-user" style="font-size:64px;color:var(--text3)"></i>';
     }
     loadSkinGallery();
 }
 const FEATURED_SKINS = [
-    { name: 'Dream', id: 'ec70bc6c-7473-4c50-bb02-e4421508d208' },
-    { name: 'Technoblade', id: 'b0231908-16e6-42d8-9442-99933758a099' },
-    { name: 'Mumbo Jumbo', id: 'c3562a01-447a-4293-8472-353272f7d391' },
-    { name: 'Grian', id: '0d481f14-04f7-4180-87a7-5f725350325d' },
-    { name: 'DanTDM', id: '71626002-c971-460d-8547-0e6d6232e0e0' },
-    { name: 'CaptainSparklez', id: 'b757e841-f62f-4886-9041-f9c49ca52825' }
+    { name: 'Dream', id: 'ec70bcaf702f4bb8b48d276fa52a780c' },
+    { name: 'Technoblade', id: 'b876ec32e396476ba1158438d83c67d4' },
+    { name: 'MumboJumbo', id: 'c7da90d56a054217b94a7d427cbbcad8' },
+    { name: 'Grian', id: '5f8eb73b25be4c5aa50fd27d65e30ca0' },
+    { name: 'DanTDM', id: '77cc85ae388a46eca5359e2ffef71b29' },
+    { name: 'CaptainSparklez', id: '5f820c3958834392b1743125ac05e38c' }
 ];
 function loadSkinGallery() {
     const grid = document.getElementById('skin-gallery-grid');
+    if (!grid) return;
     grid.innerHTML = '';
+    
+    let customSkins = JSON.parse(localStorage.getItem('xc-custom-skins') || '[]');
+    customSkins = customSkins.filter(s => s && s.id && s.id.length > 20);
+
+    const clearBtn = document.createElement('div');
+    clearBtn.style = 'grid-column: 1/-1; text-align: right; margin-bottom: 8px;';
+    clearBtn.innerHTML = '<button id="clear-skins-btn" style="background:none;border:none;color:var(--text3);font-size:11px;cursor:pointer;text-decoration:underline;">Clear History</button>';
+    grid.appendChild(clearBtn);
+    document.getElementById('clear-skins-btn').onclick = () => {
+        if (confirm('Clear all uploaded skins from history?')) {
+            localStorage.removeItem('xc-custom-skins');
+            loadSkinGallery();
+        }
+    };
+    
+    customSkins.forEach(skin => {
+        const card = document.createElement('div');
+        card.className = 'skin-item-card custom-skin';
+        const imgSrc = skin.icon || skin.id; 
+        card.innerHTML = `
+            <div class="skin-item-preview">
+                <img src="${imgSrc}" alt="${skin.name}" style="${skin.icon ? 'height:110%;object-fit:contain;' : 'height:80%;object-fit:contain;'}">
+            </div>
+            <div class="skin-item-name">${skin.name}</div>
+            <button class="delete-skin-btn" title="Remove"><i class="ph ph-trash"></i></button>
+        `;
+        card.onclick = (e) => {
+            if (e.target.closest('.delete-skin-btn')) return;
+            loadSkinToViewer(skin.id);
+        };
+        card.querySelector('.delete-skin-btn').onclick = (e) => {
+            e.stopPropagation();
+            let skins = JSON.parse(localStorage.getItem('xc-custom-skins') || '[]');
+            skins = skins.filter(s => s.id !== skin.id);
+            localStorage.setItem('xc-custom-skins', JSON.stringify(skins));
+            loadSkinGallery();
+        };
+        grid.appendChild(card);
+    });
+
     FEATURED_SKINS.forEach(skin => {
         const card = document.createElement('div');
         card.className = 'skin-item-card';
@@ -560,7 +668,7 @@ function loadSkinGallery() {
             <div class="skin-item-name">${skin.name}</div>
         `;
         card.onclick = () => {
-            document.getElementById('current-skin-render').innerHTML = `<img src="${skinUrl(skin.id, 'renders/body', 300)}" alt="skin">`;
+            loadSkinToViewer(skinUrl(skin.id, 'skin'));
         };
         grid.appendChild(card);
     });
@@ -571,9 +679,57 @@ document.getElementById('skin-file-input').onchange = (e) => {
     if (file) {
         const reader = new FileReader();
         reader.onload = (event) => {
-            document.getElementById('current-skin-render').innerHTML = `<img src="${event.target.result}" style="image-rendering:pixelated; object-fit:contain; width:80%; height:80%;" alt="skin">`;
+            const dataUrl = event.target.result;
+            loadSkinToViewer(dataUrl, true);
         };
         reader.readAsDataURL(file);
+    }
+};
+document.getElementById('save-skin-btn').onclick = () => {
+    if (currentSkinDataUrl) {
+        loadSkinToViewer(currentSkinDataUrl, true);
+        alert('Skin saved to your gallery!');
+    }
+};
+document.getElementById('apply-skin-btn').onclick = async () => {
+    if (!currentSkinDataUrl) return alert('No skin loaded to apply.');
+    
+    const applyBtn = document.getElementById('apply-skin-btn');
+    const oldText = applyBtn.innerHTML;
+    applyBtn.disabled = true;
+    applyBtn.innerHTML = '<i class="ph ph-spinner"></i> Applying...';
+    
+    try {
+        if (settings.accountType !== 'microsoft') {
+            // Simulated apply for cracked accounts
+            await new Promise(r => setTimeout(r, 1000));
+            alert('Skin applied to launcher! For cracked accounts, you may need a "Skin Restorer" mod to see this skin in-game on multiplayer servers.');
+            return;
+        }
+
+        let skinToApply = currentSkinDataUrl;
+        if (skinToApply.startsWith('http')) {
+            const resp = await fetch(skinToApply);
+            const blob = await resp.blob();
+            skinToApply = await new Promise(r => {
+                const fr = new FileReader();
+                fr.onload = () => r(fr.result);
+                fr.readAsDataURL(blob);
+            });
+        }
+        
+        const result = await window.electronAPI.applySkin({ skinDataUrl: skinToApply, isSlim: false });
+        if (result.success) {
+            alert('Skin applied successfully to your Mojang account! (It may take a few minutes to update globally)');
+            // Refresh social page to show new skin
+            setTimeout(renderSocialPage, 2000);
+        }
+        else alert('Failed to apply skin: ' + result.error);
+    } catch (e) {
+        alert('Error applying skin: ' + e.message);
+    } finally {
+        applyBtn.disabled = false;
+        applyBtn.innerHTML = oldText;
     }
 };
 document.getElementById('player-search-btn').addEventListener('click', searchPlayers);
@@ -591,7 +747,7 @@ async function searchPlayers() {
         const card = document.createElement('div');
         card.className = 'player-card';
         card.innerHTML = `
-            <div class="player-card-skin"><img src="${skinUrl(data.id, 'renders/body', 52)}" alt="skin"></div>
+            <div class="player-card-skin"><img src="${skinUrl(data.id, 'avatar', 52)}" alt="skin"></div>
             <div class="player-card-info">
                 <div class="player-card-name">${data.name}</div>
                 <div class="player-card-uuid">${data.id}</div>

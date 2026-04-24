@@ -10,6 +10,10 @@ const { autoUpdater } = require('electron-updater');
 const launcher = new Client();
 let mainWindow;
 let cachedMsToken = null;
+const MS_TOKEN_PATH = path.join(app.getPath('userData'), 'ms-token.json');
+if (fs.existsSync(MS_TOKEN_PATH)) {
+    try { cachedMsToken = JSON.parse(fs.readFileSync(MS_TOKEN_PATH, 'utf8')); } catch(e) {}
+}
 const JAVA_DIR = path.join(app.getPath('userData'), 'java');
 const ADOPTIUM_API = 'https://api.adoptium.net/v3/assets/latest/21/hotspot?os=linux&architecture=x64&image_type=jre';
 function findSystemJava() {
@@ -199,6 +203,7 @@ ipcMain.on('ms-login', async (event) => {
         const xboxManager = await authManager.launch('electron');
         const token = await xboxManager.getMinecraft();
         cachedMsToken = token.mclc();
+        fs.writeFileSync(MS_TOKEN_PATH, JSON.stringify(cachedMsToken));
         event.sender.send('ms-login-reply', { success: true, username: cachedMsToken.name || 'Premium User' });
     } catch (error) {
         event.sender.send('ms-login-reply', { success: false, error: String(error) });
@@ -254,5 +259,42 @@ ipcMain.on('launch-game', async (event, settings) => {
     } catch (error) {
         console.error('Launch Error:', error);
         send('error', error.message);
+    }
+});
+ipcMain.handle('apply-skin', async (event, { skinDataUrl, isSlim }) => {
+    console.log('[Skin] Apply request. Token available:', !!cachedMsToken, cachedMsToken ? `(User: ${cachedMsToken.name})` : '');
+    if (!cachedMsToken || !cachedMsToken.access_token) return { success: false, error: 'Not logged in with Microsoft.' };
+    try {
+        const base64Data = skinDataUrl.split(',')[1];
+        const buffer = Buffer.from(base64Data, 'base64');
+        const boundary = '----WebKitFormBoundary' + Math.random().toString(36).substring(2);
+        
+        const payload = Buffer.concat([
+            Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="variant"\r\n\r\n${isSlim ? 'slim' : 'classic'}\r\n`),
+            Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="skin.png"\r\nContent-Type: image/png\r\n\r\n`),
+            buffer,
+            Buffer.from(`\r\n--${boundary}--\r\n`)
+        ]);
+
+        return new Promise((resolve) => {
+            const req = https.request({
+                hostname: 'api.minecraftservices.com',
+                path: '/minecraft/profile/skins',
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${cachedMsToken.access_token}`,
+                    'Content-Type': `multipart/form-data; boundary=${boundary}`,
+                    'Content-Length': payload.length
+                }
+            }, (res) => {
+                if (res.statusCode === 200 || res.statusCode === 204) resolve({ success: true });
+                else resolve({ success: false, error: `Mojang API error: ${res.statusCode}` });
+            });
+            req.on('error', (e) => resolve({ success: false, error: e.message }));
+            req.write(payload);
+            req.end();
+        });
+    } catch (e) {
+        return { success: false, error: String(e) };
     }
 });

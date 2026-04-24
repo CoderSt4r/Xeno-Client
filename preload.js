@@ -16,4 +16,5 @@ contextBridge.exposeInMainWorld('electronAPI', {
     onUpdateAvailable: (cb) => ipcRenderer.on('update_available', () => cb()),
     onUpdateDownloaded: (cb) => ipcRenderer.on('update_downloaded', () => cb()),
     restartApp: () => ipcRenderer.send('restart_app'),
+    applySkin: (opts) => ipcRenderer.invoke('apply-skin', opts),
 });

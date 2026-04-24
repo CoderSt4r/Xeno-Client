@@ -286,13 +286,23 @@ html, body { height:100%; overflow:hidden; font-family:'Inter',sans-serif; backg
 /* Skins Page */
 .skins-layout { display: grid; grid-template-columns: 320px 1fr; gap: 28px; }
 .skin-preview-section { display: flex; flex-direction: column; gap: 24px; align-items: center; height: fit-content; }
-.skin-viewer-3d { width: 100%; aspect-ratio: 1; background: var(--bg3); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; border: 1px solid var(--border); }
+.skin-viewer-3d { width: 100%; aspect-ratio: 1; background: radial-gradient(circle at center, var(--bg3) 0%, var(--bg4) 100%); border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; border: 1px solid var(--border); box-shadow: inset 0 0 40px rgba(0,0,0,0.2); }
+.skin-viewer-3d canvas { width: 100% !important; height: 100% !important; outline: none; cursor: grab; }
+.skin-viewer-3d canvas:active { cursor: grabbing; }
 .skin-render-large { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
 .skin-render-large img { height: 90%; object-fit: contain; image-rendering: pixelated; filter: drop-shadow(0 12px 24px rgba(0,0,0,0.6)); transition: var(--trans); }
 .skin-actions { width: 100%; }
 .skin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
-.skin-item-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; cursor: pointer; transition: var(--trans); display: flex; flex-direction: column; align-items: center; gap: 10px; }
-.skin-item-card:hover { border-color: var(--accent); transform: translateY(-4px); background: var(--bg3); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+.skin-item-card { background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; align-items: center; gap: 10px; position: relative; overflow: hidden; }
+.skin-item-card:hover { border-color: var(--accent); transform: translateY(-6px); background: var(--bg3); box-shadow: 0 12px 32px rgba(0,0,0,0.4); }
+.skin-item-card:hover .skin-item-preview img { transform: scale(1.1) rotate(2deg); }
+.skin-item-card::after { content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.05), transparent); transition: 0.5s; }
+.skin-item-card:hover::after { left: 100%; }
 .skin-item-preview { width: 100%; aspect-ratio: 0.8; background: var(--bg4); border-radius: 10px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-.skin-item-preview img { height: 110%; object-fit: contain; image-rendering: pixelated; }
+.skin-item-preview img { height: 110%; object-fit: contain; image-rendering: pixelated; transition: all 0.4s ease; }
 .skin-item-name { font-size: 12px; font-weight: 600; color: var(--text2); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+.custom-skin { border: 1px dashed var(--border); }
+.custom-skin:hover { border-style: solid; border-color: var(--accent); }
+.delete-skin-btn { position: absolute; top: 6px; right: 6px; width: 24px; height: 24px; border-radius: 6px; background: rgba(0,0,0,0.5); color: #ef4444; border: none; display: flex; align-items: center; justify-content: center; opacity: 0; transition: 0.2s; cursor: pointer; }
+.skin-item-card:hover .delete-skin-btn { opacity: 1; }
+.delete-skin-btn:hover { background: #ef4444; color: white; transform: scale(1.1); }

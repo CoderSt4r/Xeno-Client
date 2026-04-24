@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+    <script src="https://unpkg.com/skinview3d@3.4.1/bundles/skinview3d.bundle.js"></script>
 </head>
 <body>
     <div class="titlebar" id="titlebar">
@@ -230,9 +231,16 @@
                                 <i class="ph ph-user" style="font-size:64px;color:var(--text3)"></i>
                              </div>
                         </div>
+                        <div id="skin-login-status" style="font-size:12px;font-weight:600;margin-bottom:8px;text-align:center;"></div>
                         <div class="skin-actions">
                             <button class="btn-primary full-width" id="upload-skin-btn" style="width:100%;justify-content:center;">
                                 <i class="ph ph-upload-simple"></i> Upload Skin
+                            </button>
+                            <button class="btn-secondary full-width" id="save-skin-btn" style="width:100%;justify-content:center;margin-top:10px;">
+                                <i class="ph ph-bookmark"></i> Save to Gallery
+                            </button>
+                            <button class="btn-secondary full-width" id="apply-skin-btn" style="width:100%;justify-content:center;margin-top:10px;">
+                                <i class="ph ph-check"></i> Apply to Account
                             </button>
                             <input type="file" id="skin-file-input" accept="image/png" hidden>
                             <p class="section-desc" style="text-align:center;margin-top:12px;">Supports Standard and Slim skins.</p>
