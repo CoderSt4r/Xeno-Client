@@ -168,35 +168,64 @@ function renderProfilesPage() {
         saveProfiles(); renderProfilesPage();
     }));
 }
+function renderProfileVersions() {
+    const verSel = document.getElementById('profile-version-input');
+    const showSnapshots = document.getElementById('show-snapshots-toggle').checked;
+    const currentVal = verSel.value;
+    verSel.innerHTML = '';
+    
+    if (mcVersions.length) {
+        const releases = mcVersions.filter(v => v.type === 'release');
+        const snapshots = mcVersions.filter(v => v.type !== 'release');
+        
+        if (releases.length > 0) {
+            const relGroup = document.createElement('optgroup');
+            relGroup.label = '✦ Releases';
+            releases.forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v.id; opt.textContent = v.id;
+                relGroup.appendChild(opt);
+            });
+            verSel.appendChild(relGroup);
+        }
+        
+        if (showSnapshots && snapshots.length > 0) {
+            const snapGroup = document.createElement('optgroup');
+            snapGroup.label = '⚡ Snapshots';
+            snapshots.forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v.id; opt.textContent = v.id;
+                snapGroup.appendChild(opt);
+            });
+            verSel.appendChild(snapGroup);
+        }
+        
+        if (Array.from(verSel.options).some(o => o.value === currentVal)) {
+            verSel.value = currentVal;
+        }
+    } else {
+        const opt = document.createElement('option');
+        opt.textContent = 'No versions found. Try restarting.';
+        verSel.appendChild(opt);
+        if (!mcVersions.length) loadVersions();
+    }
+}
+document.getElementById('show-snapshots-toggle').addEventListener('change', renderProfileVersions);
+
 function openProfileModal(id = null) {
     editingProfileId = id;
     selectedColor = '#6366f1';
     const modal = document.getElementById('profile-modal-backdrop');
     modal.classList.remove('hidden');
+    
+    const p = id ? profiles.find(pr => pr.id === id) : null;
+    const isSnapshot = p ? mcVersions.some(v => v.id === p.version && v.type !== 'release') : false;
+    document.getElementById('show-snapshots-toggle').checked = isSnapshot;
+    
+    renderProfileVersions();
+
     const verSel = document.getElementById('profile-version-input');
-    verSel.innerHTML = '';
-    if (mcVersions.length) {
-        let lastType = '';
-        mcVersions.forEach(v => {
-            if (v.type !== lastType) {
-                const og = document.createElement('optgroup');
-                og.label = v.type === 'release' ? '✦ Releases' : '⚡ Snapshots';
-                verSel.appendChild(og);
-                lastType = v.type;
-            }
-            const opt = document.createElement('option');
-            opt.value = v.id; opt.textContent = v.id;
-            verSel.appendChild(opt);
-        });
-    } else {
-        const opt = document.createElement('option');
-        opt.textContent = 'No versions found. Try restarting.';
-        verSel.appendChild(opt);
-        // Trigger a retry if empty
-        if (!mcVersions.length) loadVersions();
-    }
-    if (id) {
-        const p = profiles.find(pr => pr.id === id);
+    if (p) {
         document.getElementById('profile-modal-title').textContent = 'Edit Profile';
         document.getElementById('profile-name-input').value = p.name;
         verSel.value = p.version;

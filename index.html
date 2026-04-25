@@ -502,7 +502,12 @@
                     <input type="text" class="text-input" id="profile-name-input" placeholder="My Modded Instance">
                 </div>
                 <div class="form-group">
-                    <label>Minecraft Version</label>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:7px;">
+                        <label style="margin:0;">Minecraft Version</label>
+                        <label style="display:flex; align-items:center; gap:6px; font-size:11px; color:var(--text2); cursor:pointer; font-weight:600; text-transform:uppercase; letter-spacing:0.06em;">
+                            <input type="checkbox" id="show-snapshots-toggle" style="accent-color:var(--accent);"> Snapshots
+                        </label>
+                    </div>
                     <select class="select-input full-width" id="profile-version-input">
                         <option value="">Loading versions...</option>
                     </select>
