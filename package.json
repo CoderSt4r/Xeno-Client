@@ -1,6 +1,6 @@
 {
   "name": "xenoclient",
-  "version": "1.0.19",
+  "version": "1.0.20",
   "description": "Advanced Minecraft Launcher",
   "main": "main.js",
   "scripts": {
@@ -25,7 +25,14 @@
         "AppImage",
         "deb"
       ],
+      "icon": "icon.png",
       "category": "Game",
+      "desktop": {
+        "Name": "XenoClient",
+        "Comment": "Advanced Minecraft Launcher",
+        "Categories": "Game;ActionGame;",
+        "Keywords": "minecraft;launcher;xeno;"
+      },
       "maintainer": "Xeno <contact@xenoclient.com>",
       "executableArgs": [
         "--no-sandbox"

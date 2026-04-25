@@ -13,7 +13,7 @@ let mainWindow;
 let cachedMsToken = null;
 const MS_TOKEN_PATH = path.join(app.getPath('userData'), 'ms-token.json');
 if (fs.existsSync(MS_TOKEN_PATH)) {
-    try { cachedMsToken = JSON.parse(fs.readFileSync(MS_TOKEN_PATH, 'utf8')); } catch(e) {}
+    try { cachedMsToken = JSON.parse(fs.readFileSync(MS_TOKEN_PATH, 'utf8')); } catch (e) { }
 }
 const JAVA_DIR = path.join(app.getPath('userData'), 'java');
 function getAdoptiumApi() {
@@ -48,7 +48,7 @@ function findSystemJava() {
         try {
             const which = execSync('which java').toString().trim();
             if (which) candidates.push(which);
-        } catch (_) {}
+        } catch (_) { }
     }
 
     for (const p of candidates) {
@@ -97,17 +97,16 @@ async function ensureJava(sendStatus) {
     const dlUrl = asset.binary.package.link;
     const fileName = path.basename(dlUrl);
     const filePath = path.join(app.getPath('userData'), fileName);
-    
+
     if (fs.existsSync(JAVA_DIR)) fs.rmSync(JAVA_DIR, { recursive: true, force: true });
     fs.mkdirSync(JAVA_DIR, { recursive: true });
-    
+
     sendStatus(`Downloading ${fileName}...`);
     await downloadFile(dlUrl, filePath);
     sendStatus('Extracting Java...');
-    
+
     if (fileName.endsWith('.zip')) {
         await extract(filePath, { dir: JAVA_DIR });
-        // Handle nested folder if present
         const contents = fs.readdirSync(JAVA_DIR);
         if (contents.length === 1 && fs.statSync(path.join(JAVA_DIR, contents[0])).isDirectory()) {
             const sub = path.join(JAVA_DIR, contents[0]);
@@ -123,11 +122,11 @@ async function ensureJava(sendStatus) {
             });
         });
     }
-    
+
     fs.unlinkSync(filePath);
     const javaExe = path.join(JAVA_DIR, 'bin', process.platform === 'win32' ? 'javaw.exe' : 'java');
     if (process.platform !== 'win32') fs.chmodSync(javaExe, 0o755);
-    
+
     if (!fs.existsSync(javaExe)) throw new Error('Failed to find java executable after extraction.');
     sendStatus('Java 21 installed!');
     return javaExe;
@@ -137,9 +136,8 @@ const MIN_VERSION_NUM = [1, 12, 0];
 function parseVer(v) {
     const m = v.match(/^(\d+)\.(\d+)(?:\.(\d+))?/);
     if (!m) {
-        // Try to handle snapshots like 24w14a by just taking the year part or ignoring
         const snap = v.match(/^(\d{2})w(\d{2})[a-z]/);
-        if (snap) return [1, parseInt(snap[1]) + 10, parseInt(snap[2])]; // Hacky mapping for snapshots
+        if (snap) return [1, parseInt(snap[1]) + 10, parseInt(snap[2])];
         return null;
     }
     return [parseInt(m[1]), parseInt(m[2]), parseInt(m[3] || 0)];
@@ -213,7 +211,6 @@ function createWindow() {
         }
     });
     mainWindow.loadFile('login.html');
-    // Delay update check so the main window has time to load and renderer.js is ready
     mainWindow.webContents.on('did-finish-load', () => {
         setTimeout(() => autoUpdater.checkForUpdatesAndNotify(), 3000);
     });
@@ -248,7 +245,6 @@ ipcMain.on('open-main', (event, sessionJson) => {
     });
     mainWindow.webContents.on('did-finish-load', () => {
         mainWindow.webContents.send('session-data', JSON.parse(sessionJson));
-        // Check for updates now that renderer.js is loaded and can receive events
         setTimeout(() => autoUpdater.checkForUpdatesAndNotify(), 2000);
     });
 });
@@ -323,7 +319,7 @@ ipcMain.handle('apply-skin', async (event, { skinDataUrl, isSlim }) => {
         const base64Data = skinDataUrl.split(',')[1];
         const buffer = Buffer.from(base64Data, 'base64');
         const boundary = '----WebKitFormBoundary' + Math.random().toString(36).substring(2);
-        
+
         const payload = Buffer.concat([
             Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="variant"\r\n\r\n${isSlim ? 'slim' : 'classic'}\r\n`),
             Buffer.from(`--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="skin.png"\r\nContent-Type: image/png\r\n\r\n`),
