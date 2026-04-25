@@ -213,7 +213,10 @@ function createWindow() {
         }
     });
     mainWindow.loadFile('login.html');
-    autoUpdater.checkForUpdatesAndNotify();
+    // Delay update check so the main window has time to load and renderer.js is ready
+    mainWindow.webContents.on('did-finish-load', () => {
+        setTimeout(() => autoUpdater.checkForUpdatesAndNotify(), 3000);
+    });
 }
 autoUpdater.on('update-available', () => {
     mainWindow.webContents.send('update_available');
@@ -245,6 +248,8 @@ ipcMain.on('open-main', (event, sessionJson) => {
     });
     mainWindow.webContents.on('did-finish-load', () => {
         mainWindow.webContents.send('session-data', JSON.parse(sessionJson));
+        // Check for updates now that renderer.js is loaded and can receive events
+        setTimeout(() => autoUpdater.checkForUpdatesAndNotify(), 2000);
     });
 });
 ipcMain.on('ms-login', async (event) => {
