@@ -190,8 +190,10 @@ function openProfileModal(id = null) {
         });
     } else {
         const opt = document.createElement('option');
-        opt.textContent = 'Loading versions...';
+        opt.textContent = 'No versions found. Try restarting.';
         verSel.appendChild(opt);
+        // Trigger a retry if empty
+        if (!mcVersions.length) loadVersions();
     }
     if (id) {
         const p = profiles.find(pr => pr.id === id);
@@ -807,18 +809,28 @@ function updateSessionUI() {
     if (avatar) avatar.title = name;
 }
 updateSessionUI();
-window.electronAPI.getVersions().then(versions => {
-    mcVersions = versions || [];
-    const vf = document.getElementById('mod-version-filter');
-    if (vf && mcVersions.length) {
-        vf.innerHTML = '<option value="">All Versions</option>';
-        mcVersions.filter(v => v.type === 'release').forEach(v => {
-            const o = document.createElement('option');
-            o.value = v.id; o.textContent = v.id;
-            vf.appendChild(o);
-        });
-    }
-}).catch(console.error);
+function loadVersions() {
+    window.electronAPI.getVersions().then(versions => {
+        mcVersions = versions || [];
+        const vf = document.getElementById('mod-version-filter');
+        if (vf && mcVersions.length) {
+            vf.innerHTML = '<option value="">All Versions</option>';
+            mcVersions.filter(v => v.type === 'release').forEach(v => {
+                const o = document.createElement('option');
+                o.value = v.id; o.textContent = v.id;
+                vf.appendChild(o);
+            });
+        }
+        // Update profile version selector if it's open
+        const verSel = document.getElementById('profile-version-input');
+        if (verSel && !document.getElementById('profile-modal-backdrop').classList.contains('hidden') && mcVersions.length) {
+            openProfileModal(editingProfileId); 
+        }
+    }).catch(e => {
+        console.error('Failed to load versions:', e);
+    });
+}
+loadVersions();
 const updateNotif = document.getElementById('update-notification');
 const updateSub = document.getElementById('update-sub');
 const restartBtn = document.getElementById('restart-button');
@@ -830,6 +842,19 @@ window.electronAPI.onUpdateDownloaded(() => {
     updateSub.textContent = 'Update ready.';
     restartBtn.classList.remove('hidden');
 });
+window.electronAPI.onUpdateNotAvailable(() => {
+    alert('You are already on the latest version!');
+});
 restartBtn.addEventListener('click', () => {
     window.electronAPI.restartApp();
 });
+document.getElementById('manual-update-btn').onclick = () => {
+    const btn = document.getElementById('manual-update-btn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="ph ph-spinner"></i> Checking...';
+    window.electronAPI.checkUpdates();
+    setTimeout(() => {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="ph ph-arrows-clockwise"></i> Check for Updates';
+    }, 3000);
+};

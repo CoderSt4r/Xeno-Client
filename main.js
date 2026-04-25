@@ -7,6 +7,7 @@ const { execSync, exec } = require('child_process');
 const { Client, Authenticator } = require('minecraft-launcher-core');
 const { Auth } = require('msmc');
 const { autoUpdater } = require('electron-updater');
+const extract = require('extract-zip');
 const launcher = new Client();
 let mainWindow;
 let cachedMsToken = null;
@@ -15,26 +16,44 @@ if (fs.existsSync(MS_TOKEN_PATH)) {
     try { cachedMsToken = JSON.parse(fs.readFileSync(MS_TOKEN_PATH, 'utf8')); } catch(e) {}
 }
 const JAVA_DIR = path.join(app.getPath('userData'), 'java');
-const ADOPTIUM_API = 'https://api.adoptium.net/v3/assets/latest/21/hotspot?os=linux&architecture=x64&image_type=jre';
+function getAdoptiumApi() {
+    const os = process.platform === 'win32' ? 'windows' : 'linux';
+    const arch = process.arch === 'arm64' ? 'aarch64' : 'x64';
+    return `https://api.adoptium.net/v3/assets/latest/21/hotspot?os=${os}&architecture=${arch}&image_type=jre`;
+}
 function findSystemJava() {
+    const isWin = process.platform === 'win32';
+    const javaExe = isWin ? 'javaw.exe' : 'java';
     const candidates = [
-        '/usr/bin/java',
-        '/usr/local/bin/java',
-        '/usr/lib/jvm/java-21-openjdk-amd64/bin/java',
-        '/usr/lib/jvm/java-17-openjdk-amd64/bin/java',
-        '/usr/lib/jvm/java-21/bin/java',
-        '/usr/lib/jvm/java-17/bin/java',
-        '/usr/lib/jvm/default-java/bin/java',
-        path.join(JAVA_DIR, 'bin', 'java')
+        path.join(JAVA_DIR, 'bin', javaExe)
     ];
-    for (const p of candidates) {
-        if (fs.existsSync(p)) return p;
+
+    if (isWin) {
+        const programFiles = [process.env.ProgramFiles, process.env['ProgramFiles(x86)']];
+        programFiles.forEach(pf => {
+            if (!pf) return;
+            const jDirs = [path.join(pf, 'Java'), path.join(pf, 'Eclipse Foundation'), path.join(pf, 'Adoptium')];
+            jDirs.forEach(jd => {
+                if (fs.existsSync(jd)) {
+                    fs.readdirSync(jd).forEach(v => {
+                        candidates.push(path.join(jd, v, 'bin', 'javaw.exe'));
+                        candidates.push(path.join(jd, v, 'jre', 'bin', 'javaw.exe'));
+                    });
+                }
+            });
+        });
+        if (process.env.JAVA_HOME) candidates.push(path.join(process.env.JAVA_HOME, 'bin', 'javaw.exe'));
+    } else {
+        candidates.push('/usr/bin/java', '/usr/local/bin/java', '/usr/lib/jvm/default-java/bin/java');
+        try {
+            const which = execSync('which java').toString().trim();
+            if (which) candidates.push(which);
+        } catch (_) {}
     }
-    try { return execSync('which java').toString().trim(); } catch (_) { }
-    try {
-        const alt = execSync('update-alternatives --list java 2>/dev/null').toString().trim().split('\n')[0];
-        if (alt && fs.existsSync(alt)) return alt;
-    } catch (_) { }
+
+    for (const p of candidates) {
+        if (p && fs.existsSync(p)) return p;
+    }
     return null;
 }
 async function downloadFile(url, dest) {
@@ -72,24 +91,44 @@ async function ensureJava(sendStatus) {
     const system = findSystemJava();
     if (system) { sendStatus(`Using Java at: ${system}`); return system; }
     sendStatus('Java not found. Downloading Java 21...');
-    const apiResp = await httpsGet(ADOPTIUM_API);
+    const apiResp = await httpsGet(getAdoptiumApi());
     const assets = JSON.parse(apiResp);
     const asset = assets[0];
     const dlUrl = asset.binary.package.link;
-    const tarName = path.basename(dlUrl);
-    const tarPath = path.join(JAVA_DIR, tarName);
+    const fileName = path.basename(dlUrl);
+    const filePath = path.join(app.getPath('userData'), fileName);
+    
+    if (fs.existsSync(JAVA_DIR)) fs.rmSync(JAVA_DIR, { recursive: true, force: true });
     fs.mkdirSync(JAVA_DIR, { recursive: true });
-    sendStatus(`Downloading ${tarName}...`);
-    await downloadFile(dlUrl, tarPath);
+    
+    sendStatus(`Downloading ${fileName}...`);
+    await downloadFile(dlUrl, filePath);
     sendStatus('Extracting Java...');
-    await new Promise((resolve, reject) => {
-        exec(`tar -xf "${tarPath}" -C "${JAVA_DIR}" --strip-components=1`, (err) => {
-            if (err) reject(err); else resolve();
+    
+    if (fileName.endsWith('.zip')) {
+        await extract(filePath, { dir: JAVA_DIR });
+        // Handle nested folder if present
+        const contents = fs.readdirSync(JAVA_DIR);
+        if (contents.length === 1 && fs.statSync(path.join(JAVA_DIR, contents[0])).isDirectory()) {
+            const sub = path.join(JAVA_DIR, contents[0]);
+            for (const f of fs.readdirSync(sub)) {
+                fs.renameSync(path.join(sub, f), path.join(JAVA_DIR, f));
+            }
+            fs.rmdirSync(sub);
+        }
+    } else {
+        await new Promise((resolve, reject) => {
+            exec(`tar -xf "${filePath}" -C "${JAVA_DIR}" --strip-components=1`, (err) => {
+                if (err) reject(err); else resolve();
+            });
         });
-    });
-    fs.unlinkSync(tarPath);
-    const javaExe = path.join(JAVA_DIR, 'bin', 'java');
-    fs.chmodSync(javaExe, 0o755);
+    }
+    
+    fs.unlinkSync(filePath);
+    const javaExe = path.join(JAVA_DIR, 'bin', process.platform === 'win32' ? 'javaw.exe' : 'java');
+    if (process.platform !== 'win32') fs.chmodSync(javaExe, 0o755);
+    
+    if (!fs.existsSync(javaExe)) throw new Error('Failed to find java executable after extraction.');
     sendStatus('Java 21 installed!');
     return javaExe;
 }
@@ -97,7 +136,12 @@ const MC_MANIFEST = 'https://piston-meta.mojang.com/mc/game/version_manifest_v2.
 const MIN_VERSION_NUM = [1, 12, 0];
 function parseVer(v) {
     const m = v.match(/^(\d+)\.(\d+)(?:\.(\d+))?/);
-    if (!m) return null;
+    if (!m) {
+        // Try to handle snapshots like 24w14a by just taking the year part or ignoring
+        const snap = v.match(/^(\d{2})w(\d{2})[a-z]/);
+        if (snap) return [1, parseInt(snap[1]) + 10, parseInt(snap[2])]; // Hacky mapping for snapshots
+        return null;
+    }
     return [parseInt(m[1]), parseInt(m[2]), parseInt(m[3] || 0)];
 }
 function verGte(a, b) {
@@ -177,8 +221,14 @@ autoUpdater.on('update-available', () => {
 autoUpdater.on('update-downloaded', () => {
     mainWindow.webContents.send('update_downloaded');
 });
+autoUpdater.on('update-not-available', () => {
+    mainWindow.webContents.send('update_not_available');
+});
 ipcMain.on('restart_app', () => {
     autoUpdater.quitAndInstall();
+});
+ipcMain.on('check_updates', () => {
+    autoUpdater.checkForUpdatesAndNotify();
 });
 app.whenReady().then(createWindow);
 app.on('window-all-closed', () => { if (process.platform !== 'darwin') app.quit(); });

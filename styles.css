@@ -273,15 +273,44 @@ html, body { height:100%; overflow:hidden; font-family:'Inter',sans-serif; backg
 .mc-link-preview.hidden { display:none; }
 .mc-link-err { color:var(--red); font-size:13px; margin-bottom:8px; }
 .mc-link-err.hidden { display:none; }
-#update-notification { position: fixed; bottom: 20px; right: 20px; background: var(--bg2); border: 1px solid var(--accent); border-radius: var(--radius-lg); padding: 16px 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 20px var(--accent-glow); z-index: 9999; animation: slideIn 0.5s cubic-bezier(0.18, 0.89, 0.32, 1.28); }
+#update-notification { 
+    position: fixed; 
+    bottom: 24px; 
+    right: 24px; 
+    background: rgba(18, 21, 26, 0.85); 
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(99, 102, 241, 0.4); 
+    border-radius: var(--radius-lg); 
+    padding: 18px 24px; 
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6), 0 0 30px rgba(99, 102, 241, 0.2); 
+    z-index: 10000; 
+    animation: slideInUpdate 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
 #update-notification.hidden { display: none; }
-.update-content { display: flex; align-items: center; gap: 16px; }
-.update-content i { font-size: 32px; color: var(--accent); }
-.update-text p { margin: 0; }
-#update-msg { font-weight: 700; font-size: 15px; }
-.update-subtext { font-size: 12px; color: var(--text2); margin-top: 2px !important; }
-#restart-button { margin-left: 8px; }
-@keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+.update-content { display: flex; align-items: center; gap: 20px; }
+.update-content i { 
+    font-size: 36px; 
+    color: var(--accent); 
+    animation: pulseUpdate 2s infinite ease-in-out;
+}
+.update-text { display: flex; flex-direction: column; gap: 4px; }
+#update-msg { font-weight: 800; font-size: 16px; color: #fff; letter-spacing: -0.01em; }
+.update-subtext { font-size: 13px; color: var(--text2); }
+#restart-button { 
+    margin-left: 12px; 
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    border: none;
+    box-shadow: 0 4px 12px var(--accent-glow);
+}
+@keyframes slideInUpdate { 
+    from { transform: translateX(120%) scale(0.9); opacity: 0; } 
+    to { transform: translateX(0) scale(1); opacity: 1; } 
+}
+@keyframes pulseUpdate {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+    100% { transform: scale(1); opacity: 1; }
+}
 
 /* Skins Page */
 .skins-layout { display: grid; grid-template-columns: 320px 1fr; gap: 28px; }
