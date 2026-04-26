@@ -330,10 +330,22 @@ ipcMain.on('launch-game', async (event, settings) => {
                 send('progress', e);
             }
         });
-        launcher.on('data', (e) => send('progress', String(e).slice(0, 120)));
+        let lastLogs = [];
+        launcher.on('data', (e) => {
+            const str = String(e).trim();
+            if (str) {
+                lastLogs.push(str);
+                if (lastLogs.length > 3) lastLogs.shift();
+            }
+            send('progress', str.slice(0, 120));
+        });
         launcher.on('close', (code) => { 
-            if (code !== 0) send('error', `Game crashed (Exit Code: ${code}). Wrong Java version or bad drivers?`);
-            else send('close', 'Game closed.'); 
+            if (code !== 0) {
+                const reason = lastLogs.join(' ').substring(0, 150);
+                send('error', `Exit Code ${code} | Log: ${reason}...`);
+            } else {
+                send('close', 'Game closed.'); 
+            }
         });
         await launcher.launch(opts);
         send('launching', 'Minecraft is launching!');
