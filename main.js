@@ -300,6 +300,8 @@ ipcMain.on('launch-game', async (event, settings) => {
         const safeProfile = (settings.profileName || 'default').replace(/[^a-zA-Z0-9_-]/g, '_');
         const profileModsDir = path.join(app.getPath('userData'), 'profiles', safeProfile, 'mods');
         const mcRoot = path.join(app.getPath('appData'), '.xenoclient');
+        if (!fs.existsSync(mcRoot)) fs.mkdirSync(mcRoot, { recursive: true });
+        if (!fs.existsSync(path.join(mcRoot, 'cache', 'json'))) fs.mkdirSync(path.join(mcRoot, 'cache', 'json'), { recursive: true });
         const mcModsDir = path.join(mcRoot, 'mods');
         if (fs.existsSync(mcModsDir)) fs.rmSync(mcModsDir, { recursive: true });
         if (fs.existsSync(profileModsDir)) {
