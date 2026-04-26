@@ -24,7 +24,7 @@ function getAdoptiumApi() {
 }
 function findSystemJava() {
     const isWin = process.platform === 'win32';
-    const javaExe = isWin ? 'javaw.exe' : 'java';
+    const javaExe = isWin ? 'java.exe' : 'java';
     const candidates = [
         path.join(JAVA_DIR, 'bin', javaExe)
     ];
@@ -37,13 +37,13 @@ function findSystemJava() {
             jDirs.forEach(jd => {
                 if (fs.existsSync(jd)) {
                     fs.readdirSync(jd).forEach(v => {
-                        candidates.push(path.join(jd, v, 'bin', 'javaw.exe'));
-                        candidates.push(path.join(jd, v, 'jre', 'bin', 'javaw.exe'));
+                        candidates.push(path.join(jd, v, 'bin', 'java.exe'));
+                        candidates.push(path.join(jd, v, 'jre', 'bin', 'java.exe'));
                     });
                 }
             });
         });
-        if (process.env.JAVA_HOME) candidates.push(path.join(process.env.JAVA_HOME, 'bin', 'javaw.exe'));
+        if (process.env.JAVA_HOME) candidates.push(path.join(process.env.JAVA_HOME, 'bin', 'java.exe'));
     } else {
         candidates.push('/usr/bin/java', '/usr/local/bin/java', '/usr/lib/jvm/default-java/bin/java');
         try {
@@ -130,7 +130,7 @@ async function ensureJava(sendStatus) {
     }
 
     fs.unlinkSync(filePath);
-    const javaExe = path.join(JAVA_DIR, 'bin', process.platform === 'win32' ? 'javaw.exe' : 'java');
+    const javaExe = path.join(JAVA_DIR, 'bin', process.platform === 'win32' ? 'java.exe' : 'java');
     if (process.platform !== 'win32') fs.chmodSync(javaExe, 0o755);
 
     if (!fs.existsSync(javaExe)) throw new Error('Failed to find java executable after extraction.');
