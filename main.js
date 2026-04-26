@@ -26,7 +26,12 @@ function findSystemJava() {
     const isWin = process.platform === 'win32';
     const javaExe = isWin ? 'java.exe' : 'java';
     const managedJava = path.join(JAVA_DIR, 'bin', javaExe);
-    if (fs.existsSync(managedJava)) return managedJava;
+    if (fs.existsSync(managedJava)) {
+        try {
+            const out = execSync(`"${managedJava}" -version 2>&1`).toString();
+            if (out.includes('version "21.') || out.includes('build 21.')) return managedJava;
+        } catch(e) {}
+    }
     return null;
 }
 async function downloadFile(url, dest) {
