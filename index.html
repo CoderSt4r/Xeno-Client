@@ -43,6 +43,9 @@
                 <button class="nav-icon" data-page="skins" title="Skins">
                     <i class="ph-fill ph-t-shirt"></i>
                 </button>
+                <button class="nav-icon" data-page="servers" title="Server Browser">
+                    <i class="ph-fill ph-monitor-play"></i>
+                </button>
                 <button class="nav-icon" data-page="social" title="Players">
                     <i class="ph-fill ph-users"></i>
                 </button>
@@ -126,11 +129,65 @@
                     </div>
                 </div>
             </div>
+    <div class="page" id="page-servers">
+        <div class="servers-layout">
+            <aside class="servers-sidebar">
+                <div class="servers-search-wrap">
+                    <i class="ph ph-magnifying-glass"></i>
+                    <input type="text" id="server-search-input" placeholder="Search servers..." class="servers-search-input">
+                </div>
+                <div class="filter-section">
+                    <div class="filter-label">Categories</div>
+                    <button class="filter-chip active" data-cat="all">All</button>
+                    <button class="filter-chip" data-cat="pvp"><i class="ph ph-sword"></i> PvP</button>
+                    <button class="filter-chip" data-cat="ranked"><i class="ph ph-medal"></i> Ranked</button>
+                    <button class="filter-chip" data-cat="ffa"><i class="ph ph-crosshair-simple"></i> FFA / KitPvP</button>
+                    <button class="filter-chip" data-cat="bedwars"><i class="ph ph-bed"></i> BedWars</button>
+                    <button class="filter-chip" data-cat="minigames"><i class="ph ph-game-controller"></i> Minigames</button>
+                    <button class="filter-chip" data-cat="skyblock"><i class="ph ph-island"></i> SkyBlock</button>
+                    <button class="filter-chip" data-cat="survival"><i class="ph ph-tree"></i> Survival</button>
+                    <button class="filter-chip" data-cat="creative"><i class="ph ph-paint-brush"></i> Creative</button>
+                    <button class="filter-chip" data-cat="prison"><i class="ph ph-lock-key"></i> Prison</button>
+                    <button class="filter-chip" data-cat="factions"><i class="ph ph-flag"></i> Factions</button>
+                    <button class="filter-chip" data-cat="rpg"><i class="ph ph-shield-star"></i> RPG</button>
+                    <button class="filter-chip" data-cat="anarchy"><i class="ph ph-skull"></i> Anarchy</button>
+                    <button class="filter-chip" data-cat="roleplay"><i class="ph ph-castle-turret"></i> Roleplay</button>
+                    <button class="filter-chip" data-cat="practice"><i class="ph ph-target"></i> Practice</button>
+                    <button class="filter-chip" data-cat="modrinth"><i class="ph ph-lightning"></i> Modrinth Servers</button>
+                </div>
+                <div class="filter-section">
+                    <div class="filter-label">Sort By</div>
+                    <select class="select-input full-width" id="server-sort-select">
+                        <option value="featured">Featured</option>
+                        <option value="name">Name (A-Z)</option>
+                        <option value="online">Online First</option>
+                    </select>
+                </div>
+                <div class="filter-section">
+                    <button class="btn-primary full-width" id="refresh-servers-btn">
+                        <i class="ph ph-arrows-clockwise"></i> Refresh List
+                    </button>
+                </div>
+                <div class="servers-count-label">Showing <span id="server-count">0</span> servers</div>
+            </aside>
+            <div class="servers-main">
+                <div class="servers-grid" id="servers-grid">
+                    <div class="loading-state"><div class="spinner"></div><p>Loading servers...</p></div>
+                </div>
+                <div class="servers-pagination">
+                    <button class="btn-secondary btn-sm" id="servers-prev-btn" disabled><i class="ph ph-caret-left"></i> Prev</button>
+                    <span id="servers-page-label" style="font-size:13px;color:var(--text2);">Page 1</span>
+                    <button class="btn-secondary btn-sm" id="servers-next-btn"><i class="ph ph-caret-right"></i> Next</button>
+                </div>
+            </div>
+        </div>
+    </div>
             <div class="page" id="page-profiles">
                 <div class="page-header">
                     <div>
                         <h1>Profiles</h1>
                         <p class="subtitle">Manage your Minecraft instances.</p>
+                        <p>DEBUG: Profiles view loaded.</p>
                     </div>
                     <button class="btn-primary" id="create-profile-btn">
                         <i class="ph ph-plus"></i> Create Profile

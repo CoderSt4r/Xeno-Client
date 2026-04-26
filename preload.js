@@ -18,5 +18,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     onUpdateNotAvailable: (cb) => ipcRenderer.on('update_not_available', () => cb()),
     restartApp: () => ipcRenderer.send('restart_app'),
     checkUpdates: () => ipcRenderer.send('check_updates'),
+    getServers: () => ipcRenderer.invoke('get-servers'),
+    checkServer: (ip) => ipcRenderer.invoke('check-server', ip),
     applySkin: (opts) => ipcRenderer.invoke('apply-skin', opts),
 });

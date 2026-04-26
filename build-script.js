@@ -4,7 +4,7 @@ const path = require('path');
 const filesToCopy = [
     'main.js', 'renderer.js', 'login.js', 'preload.js', 
     'index.html', 'login.html', 'styles.css', 'login.css', 
-    'package.json'
+    'package.json', 'servers.json'
 ];
 
 const buildPackDir = path.join(__dirname, 'build-pack');

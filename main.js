@@ -1,3 +1,4 @@
+console.log("--- XENO CLIENT BOOTING (FIXED V3) ---");
 const { app, BrowserWindow, ipcMain } = require('electron');
 if (process.platform === 'linux') app.commandLine.appendSwitch('no-sandbox');
 const path = require('path');
@@ -76,13 +77,18 @@ async function downloadFile(url, dest) {
 async function httpsGet(url) {
     return new Promise((resolve, reject) => {
         const follow = (u) => {
-            https.get(u, { headers: { 'User-Agent': 'XenoClient/1.0 (https://github.com/CoderSt4r/Xeno-Client)' } }, (res) => {
+            const req = https.get(u, { headers: { "User-Agent": "XenoClient/1.0" } }, (res) => {
                 if (res.statusCode >= 300 && res.statusCode < 400 && res.headers.location) return follow(res.headers.location);
-                if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode} for ${u}`));
-                let data = '';
-                res.on('data', c => data += c);
-                res.on('end', () => resolve(data));
-            }).on('error', reject);
+                if (res.statusCode !== 200) return reject(new Error(`HTTP ${res.statusCode}`));
+                let data = "";
+                res.on("data", c => data += c);
+                res.on("end", () => resolve(data));
+            });
+            req.on("error", reject);
+            req.setTimeout(10000, () => {
+                req.destroy();
+                reject(new Error("Timeout"));
+            });
         };
         follow(url);
     });
@@ -199,6 +205,25 @@ ipcMain.handle('download-mod', async (event, { modId, profileName, profileVersio
         return { success: false, error: String(e) };
     }
 });
+ipcMain.handle('get-servers', async () => {
+    try {
+        const p = path.join(__dirname, 'servers.json');
+        console.log('[IPC] Reading servers from:', p);
+        if (!fs.existsSync(p)) {
+            console.error('[IPC] servers.json NOT FOUND at:', p);
+            return [];
+        }
+        const data = JSON.parse(fs.readFileSync(p, 'utf8'));
+        console.log('[IPC] Successfully read', data.length, 'servers');
+        return data;
+    } catch(e) { 
+        console.error('[IPC] Error reading servers.json:', e);
+        return []; 
+    }
+        const raw = fs.readFileSync(p, "utf8");
+        console.log("[IPC] Raw file start:", raw.substring(0, 100));
+});
+ipcMain.handle("check-server", async (event, ip) => { try { console.log("[IPC] Pinging:", ip); const raw = await httpsGet(`https://api.mcstatus.io/v2/status/java/${ip}`); const data = JSON.parse(raw); console.log("[IPC] Result for", ip, ":", data.online ? "Online" : "Offline"); return data; } catch(e) { console.error("[IPC] Ping failed for", ip, ":", e.message); return { online: false }; } });
 function createWindow() {
     mainWindow = new BrowserWindow({
         width: 820, height: 520,

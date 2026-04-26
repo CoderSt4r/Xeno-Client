@@ -1,3 +1,6 @@
+window.onerror = function(m, u, l) { alert("ERR: " + m + " @ " + l); };
+window.onunhandledrejection = function(e) { alert("ASYNC ERR: " + e.reason); };
+let xcSession = JSON.parse(localStorage.getItem('xc-session') || 'null');
 let profiles = JSON.parse(localStorage.getItem('xc-profiles') || '[]');
 let activeProfileId = localStorage.getItem('xc-active-profile') || null;
 let settings = JSON.parse(localStorage.getItem('xc-settings') || '{}');
@@ -30,14 +33,17 @@ document.querySelectorAll('.nav-icon[data-page]').forEach(btn => {
     btn.addEventListener('click', () => {
         document.querySelectorAll('.nav-icon').forEach(b => b.classList.remove('active'));
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        const targetPage = document.getElementById("page-" + btn.dataset.page);
+        if (targetPage) targetPage.classList.add("active");
         btn.classList.add('active');
-        document.getElementById('page-' + btn.dataset.page).classList.add('active');
-        if (btn.dataset.page === 'home') renderHome();
-        if (btn.dataset.page === 'profiles') renderProfilesPage();
-        if (btn.dataset.page === 'mods') { renderModPage(); fetchMods(); }
-        if (btn.dataset.page === 'library') renderLibrary();
-        if (btn.dataset.page === 'skins') renderSkinsPage();
-        if (btn.dataset.page === 'social') renderSocialPage();
+        if (btn.dataset.page === "home") renderHome();
+        if (btn.dataset.page === "profiles") renderProfilesPage();
+        if (btn.dataset.page === "mods") { renderModPage(); fetchMods(); }
+        if (btn.dataset.page === "library") renderLibrary();
+        if (btn.dataset.page === "skins") renderSkinsPage();
+        if (btn.dataset.page === "servers") { console.log("Calling renderServersPage..."); renderServersPage(); }
+        if (btn.dataset.page === "social") renderSocialPage();
+        if (btn.dataset.page === "settings") loadSettingsUI();
         if (btn.dataset.page === 'settings') loadSettingsUI();
     });
 });
@@ -887,3 +893,197 @@ document.getElementById('manual-update-btn').onclick = () => {
         btn.innerHTML = '<i class="ph ph-arrows-clockwise"></i> Check for Updates';
     }, 3000);
 };
+
+// --- Server Browser Logic ---
+let allServers = [];
+let filteredServers = [];
+let currentServerPage = 1;
+const SERVERS_PER_PAGE = 20;
+const serverStatusCache = {}; // Cache to prevent flickering and over-pinging
+
+async function renderServersPage() {
+    console.log('[Servers] renderServersPage starting...');
+    if (allServers.length === 0) {
+        document.getElementById('servers-grid').innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Loading servers...</p></div>';
+        try {
+            console.log('[Servers] Fetching from main process...');
+            allServers = await window.electronAPI.getServers();
+            if (!allServers || !Array.isArray(allServers) || allServers.length === 0) {
+                console.warn('[Servers] Empty or invalid response from main process. Using fallback list.');
+                allServers = [
+                    {"name":"Hypixel","ip":"mc.hypixel.net","categories":["minigames","bedwars","skyblock","pvp"],"description":"World's largest network with BedWars, SkyBlock and more.","version":"1.8-1.21","featured":true},
+                    {"name":"CubeCraft","ip":"play.cubecraft.net","categories":["minigames","bedwars","ffa"],"description":"Huge network with EggWars, SkyWars and more.","version":"1.8-1.21","featured":true},
+                    {"name":"Wynncraft","ip":"play.wynncraft.com","categories":["rpg","survival"],"description":"The largest MMORPG in Minecraft.","version":"1.16-1.21","featured":true},
+                    {"name":"2b2t","ip":"2b2t.org","categories":["anarchy","survival"],"description":"The oldest anarchy server in Minecraft.","version":"1.12.2"},
+                    {"name":"PvP Land","ip":"pvp.land","categories":["pvp","ffa"],"description":"Dedicated PvP server with ranked duels.","version":"1.8-1.21"},
+                    {"name":"ManaCube","ip":"mc.manacube.com","categories":["minigames","skyblock","prison"],"description":"Popular network with Prison and more.","version":"1.8-1.21"}
+                ];
+            }
+            console.log('[Servers] Final server count:', allServers.length);
+        } catch (e) {
+            console.error('[Servers] Critical failure in renderServersPage:', e);
+            allServers = [];
+        }
+        filteredServers = [...allServers];
+    }
+    console.log('[Servers] Current filtered count:', filteredServers.length);
+    applyServerFilters();
+}
+
+async function applyServerFilters() {
+    const q = document.getElementById('server-search-input').value.toLowerCase();
+    const activeChip = document.querySelector('.servers-sidebar .filter-chip.active');
+    const activeCat = activeChip ? activeChip.dataset.cat : 'all';
+    const sort = document.getElementById('server-sort-select').value;
+    
+    console.log('[Servers] Applying filters:', { q, activeCat, sort });
+
+    if (activeCat === 'modrinth') {
+        document.getElementById('servers-grid').innerHTML = '<div class="loading-state"><div class="spinner"></div><p>Fetching from Modrinth...</p></div>';
+        try {
+            const resp = await fetch(`https://api.modrinth.com/v2/search?query=${q || 'server'}&facets=[["project_type:modpack"]]&limit=20`);
+            const data = await resp.json();
+            filteredServers = data.hits.map(h => ({
+                name: h.title,
+                ip: h.slug, 
+                categories: ['modrinth', h.project_type],
+                description: h.description,
+                version: h.latest_version || 'Modpack',
+                icon: h.icon_url,
+                isModrinth: true
+            }));
+        } catch (e) {
+            console.error('[Servers] Modrinth fetch error:', e);
+            filteredServers = [];
+        }
+    } else {
+        filteredServers = allServers.filter(s => {
+            if (!s) return false;
+            const matchQ = (s.name || '').toLowerCase().includes(q) || 
+                           (s.ip || '').toLowerCase().includes(q) || 
+                           (s.description || '').toLowerCase().includes(q);
+            const matchCat = activeCat === 'all' || (s.categories && s.categories.includes(activeCat));
+            return matchQ && matchCat;
+        });
+        
+        if (sort === 'name') filteredServers.sort((a,b) => (a.name || '').localeCompare(b.name || ''));
+        else if (sort === 'featured') filteredServers.sort((a,b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+    }
+    
+    document.getElementById('server-count').textContent = filteredServers.length;
+    currentServerPage = 1;
+    renderServerGrid();
+}
+
+function renderServerGrid() {
+    console.log('[Servers] renderServerGrid starting with', filteredServers.length, 'servers');
+    const grid = document.getElementById('servers-grid');
+    if (!grid) { console.error('[Servers] Grid element not found!'); return; }
+    grid.innerHTML = '';
+    
+    if (filteredServers.length === 0) {
+        grid.innerHTML = '<div class="loading-state"><p>No servers found matching your criteria.</p></div>';
+        updateServerPagination();
+        return;
+    }
+    
+    const start = (currentServerPage - 1) * SERVERS_PER_PAGE;
+    const end = start + SERVERS_PER_PAGE;
+    const paginated = filteredServers.slice(start, end);
+    
+    // Clear and build grid
+    paginated.forEach(s => {
+        const d = document.createElement('div');
+        d.className = 'server-card';
+        const cacheId = s.ip;
+        const cached = serverStatusCache[cacheId];
+        
+        d.innerHTML = `
+            <div class="server-card-header">
+                <div class="server-info">
+                    <h3>${s.name}</h3>
+                    <div class="server-ip" title="Click to copy IP" onclick="navigator.clipboard.writeText('${s.ip}')">${s.ip}</div>
+                </div>
+                <div class="server-status" id="status-${s.ip.replace(/\./g,'-')}">
+                    <div class="status-dot ${cached?.online ? 'online' : ''}"></div> 
+                    <span class="players">${cached ? (cached.online ? (fmtNum(cached.players?.online || 0) + ' on') : 'Offline') : 'Pinging...'}</span>
+                </div>
+            </div>
+            <div class="server-cats">
+                ${(s.categories || []).slice(0,3).map(c => `<span class="server-cat">${c}</span>`).join('')}
+            </div>
+            <p class="server-desc">${s.description || ''}</p>
+        `;
+        grid.appendChild(d);
+    });
+
+    // Staggered pinging to avoid HTTP 429
+    let delay = 0;
+    paginated.forEach(s => {
+        const cacheId = s.ip;
+        const cached = serverStatusCache[cacheId];
+        const now = Date.now();
+        
+        if (!cached || (now - cached.timestamp > 120000)) {
+            setTimeout(() => {
+                window.electronAPI.checkServer(s.ip).then(st => {
+                    serverStatusCache[cacheId] = { ...st, timestamp: Date.now() };
+                    const el = document.getElementById(`status-${s.ip.replace(/\./g,'-')}`);
+                    if(!el) return;
+                    if (st && st.online) {
+                        el.querySelector('.status-dot').classList.add('online');
+                        el.querySelector('.players').textContent = fmtNum(st.players?.online || 0) + ' on';
+                    } else {
+                        el.querySelector('.status-dot').classList.remove('online');
+                        el.querySelector('.players').textContent = 'Offline';
+                    }
+                }).catch(() => {
+                    serverStatusCache[cacheId] = { online: false, timestamp: Date.now() };
+                    const el = document.getElementById(`status-${s.ip.replace(/\./g,'-')}`);
+                    if(el) el.querySelector('.players').textContent = 'Offline';
+                });
+            }, delay);
+            delay += 800; // Ping one server every 500ms
+        }
+    });
+    
+    updateServerPagination();
+}
+
+function updateServerPagination() {
+    const max = Math.ceil(filteredServers.length / SERVERS_PER_PAGE);
+    document.getElementById('servers-prev-btn').disabled = currentServerPage <= 1;
+    document.getElementById('servers-next-btn').disabled = currentServerPage >= max || max === 0;
+    document.getElementById('servers-page-label').textContent = `Page ${currentServerPage} of ${max || 1}`;
+}
+
+document.getElementById('servers-prev-btn').onclick = () => { if(currentServerPage > 1) { currentServerPage--; renderServerGrid(); } };
+document.getElementById('servers-next-btn').onclick = () => { if(currentServerPage < Math.ceil(filteredServers.length/SERVERS_PER_PAGE)) { currentServerPage++; renderServerGrid(); } };
+document.getElementById('server-search-input').addEventListener('input', applyServerFilters);
+document.getElementById('server-sort-select').addEventListener('change', applyServerFilters);
+
+document.querySelectorAll('.servers-sidebar .filter-chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.servers-sidebar .filter-chip').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        applyServerFilters();
+    });
+});
+document.getElementById('refresh-servers-btn')?.addEventListener('click', async () => {
+    const btn = document.getElementById('refresh-servers-btn');
+    const oldHtml = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="ph ph-spinner"></i> Refreshing...';
+    
+    try {
+        allServers = await window.electronAPI.getServers();
+        if (!allServers || !Array.isArray(allServers)) allServers = [];
+        filteredServers = [...allServers];
+        applyServerFilters();
+    } catch (e) {
+        console.error('Refresh error:', e);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = oldHtml;
+    }
+});

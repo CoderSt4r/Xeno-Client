@@ -1,0 +1,543 @@
+[
+  {
+    "name": "Hypixel",
+    "ip": "mc.hypixel.net",
+    "categories": [
+      "minigames",
+      "bedwars",
+      "skyblock",
+      "pvp"
+    ],
+    "description": "The world's largest Minecraft server network.",
+    "version": "1.8-1.21",
+    "featured": true
+  },
+  {
+    "name": "Donut SMP",
+    "ip": "donutsmp.net",
+    "categories": [
+      "smp",
+      "hardcore",
+      "survival"
+    ],
+    "description": "The most famous Hardcore SMP.",
+    "version": "1.19-1.21",
+    "featured": true
+  },
+  {
+    "name": "Mace SMP",
+    "ip": "macesmp.net",
+    "categories": [
+      "smp",
+      "lifesteal",
+      "survival"
+    ],
+    "description": "Competitive Lifesteal SMP.",
+    "version": "1.19-1.21",
+    "featured": true
+  },
+  {
+    "name": "Minemen Club",
+    "ip": "minemen.club",
+    "categories": [
+      "pvp",
+      "practice",
+      "duels",
+      "ranked"
+    ],
+    "description": "Competitive practice PvP with the best knockback.",
+    "version": "1.7-1.21",
+    "featured": true
+  },
+  {
+    "name": "PvP Club",
+    "ip": "mcpvp.club",
+    "categories": [
+      "pvp",
+      "ffa",
+      "practice",
+      "ranked"
+    ],
+    "description": "High-quality PvP practice and tournaments.",
+    "version": "1.7-1.21",
+    "featured": true
+  },
+  {
+    "name": "Flow PvP",
+    "ip": "flowpvp.net",
+    "categories": [
+      "pvp",
+      "ffa",
+      "kitpvp",
+      "ranked"
+    ],
+    "description": "Fast-paced PvP action and custom kits.",
+    "version": "1.8-1.21",
+    "featured": true
+  },
+  {
+    "name": "Paladium",
+    "ip": "mc.paladium-pvp.fr",
+    "categories": [
+      "factions",
+      "modded",
+      "french"
+    ],
+    "description": "Famous French modded factions server.",
+    "version": "1.8-1.21",
+    "featured": true
+  },
+  {
+    "name": "GommeHD",
+    "ip": "mc.gommehd.net",
+    "categories": [
+      "minigames",
+      "bedwars",
+      "pvp"
+    ],
+    "description": "The largest German Minecraft network.",
+    "version": "1.8-1.21"
+  },
+  {
+    "name": "Twerion",
+    "ip": "play.twerion.net",
+    "categories": [
+      "cracked",
+      "minigames",
+      "bedwars"
+    ],
+    "description": "Popular European cracked server.",
+    "version": "1.8-1.21"
+  },
+  {
+    "name": "Mineplex",
+    "ip": "us.mineplex.com",
+    "categories": [
+      "minigames",
+      "pvp"
+    ],
+    "description": "Classic minigame network.",
+    "version": "1.8-1.21"
+  },
+  {
+    "name": "CubeCraft Games",
+    "ip": "play.cubecraft.net",
+    "categories": [
+      "minigames",
+      "bedwars",
+      "ffa"
+    ],
+    "description": "EggWars, SkyWars, and much more!",
+    "version": "1.8-1.21"
+  },
+  {
+    "name": "Wynncraft",
+    "ip": "play.wynncraft.com",
+    "categories": [
+      "rpg",
+      "survival",
+      "mmo"
+    ],
+    "description": "The largest MMORPG in Minecraft.",
+    "version": "1.12.2-1.21"
+  },
+  {
+    "name": "Jartex Network",
+    "ip": "play.jartexnetwork.com",
+    "categories": [
+      "minigames",
+      "bedwars",
+      "prison"
+    ],
+    "description": "Great cracked-friendly network.",
+    "version": "1.8-1.21"
+  },
+  {
+    "name": "Complex Gaming",
+    "ip": "hub.mc-complex.com",
+    "categories": [
+      "pixelmon",
+      "survival",
+      "skyblock"
+    ],
+    "description": "Pixelmon and more!",
+    "version": "1.12.2-1.21"
+  },
+  {
+    "name": "2b2t",
+    "ip": "2b2t.org",
+    "categories": [
+      "anarchy",
+      "survival",
+      "vanilla"
+    ],
+    "description": "The oldest anarchy server in Minecraft.",
+    "version": "1.12.2-1.21"
+  },
+  {
+    "name": "PvP Land",
+    "ip": "pvp.land",
+    "categories": [
+      "pvp",
+      "practice",
+      "ffa",
+      "ranked"
+    ],
+    "description": "Professional practice and ranked duels.",
+    "version": "1.8-1.21"
+  },
+  {
+    "name": "ExtremeCraft",
+    "ip": "play.extremecraft.net",
+    "categories": [
+      "survival",
+      "creative",
+      "rpg"
+    ],
+    "description": "Many unique gamemodes to explore.",
+    "version": "1.8-1.21"
+  },
+  {
+    "name": "InsanityCraft",
+    "ip": "play.insanitycraft.net",
+    "categories": [
+      "factions",
+      "survival",
+      "skyblock"
+    ],
+    "description": "Hardcore Factions and Survival.",
+    "version": "1.8-1.21"
+  },
+  {
+    "name": "MineVille",
+    "ip": "play.mineville.net",
+    "categories": [
+      "survival",
+      "prison",
+      "skyblock"
+    ],
+    "description": "A diverse network with many gamemodes.",
+    "version": "1.8-1.21"
+  },
+  {
+    "name": "MineSuperior",
+    "ip": "play.minesuperior.com",
+    "categories": [
+      "skyblock",
+      "survival",
+      "factions"
+    ],
+    "description": "One of the best networks for 1.8-1.21.",
+    "version": "1.8-1.21"
+  },
+  {
+    "name": "Minehut",
+    "ip": "minehut.com",
+    "categories": [
+      "creative",
+      "survival",
+      "minigames"
+    ],
+    "description": "Create your own server for free!",
+    "version": "1.8-1.21"
+  },
+  {
+    "name": "Purple Prison",
+    "ip": "play.purpleprison.net",
+    "categories": [
+      "prison",
+      "pvp"
+    ],
+    "description": "The number one prison server since 2014.",
+    "version": "1.8-1.21"
+  },
+  {
+    "name": "Stratus Network",
+    "ip": "play.stratus.network",
+    "categories": [
+      "pvp",
+      "ctw"
+    ],
+    "description": "Classic Capture the Wool and PvP.",
+    "version": "1.8-1.21"
+  },
+  {
+    "name": "Lifesteal Network",
+    "ip": "play.lifesteal.net",
+    "categories": [
+      "lifesteal",
+      "smp"
+    ],
+    "description": "The original lifesteal experience.",
+    "version": "1.19-1.21"
+  },
+  {
+    "name": "Mox MC",
+    "ip": "moxmc.net",
+    "categories": [
+      "prison",
+      "creative",
+      "survival"
+    ],
+    "description": "Cracked-friendly community server.",
+    "version": "1.8-1.21"
+  },
+  {
+    "name": "Origin Realms",
+    "ip": "play.originrealms.com",
+    "categories": [
+      "survival",
+      "rpg"
+    ],
+    "description": "Vanilla+ experience with custom assets.",
+    "version": "1.16-1.21"
+  },
+  {
+    "name": "EarthMC",
+    "ip": "play.earthmc.net",
+    "categories": [
+      "towny",
+      "geopolitical"
+    ],
+    "description": "A geopolymerical earth server.",
+    "version": "1.16-1.21"
+  },
+  {
+    "name": "Mineberry",
+    "ip": "play.mineberry.org",
+    "categories": [
+      "survival",
+      "skyblock",
+      "anarchy"
+    ],
+    "description": "Large cracked network with many modes.",
+    "version": "1.8-1.21"
+  },
+  {
+    "name": "CraftYourTown",
+    "ip": "mc.craftyourtown.com",
+    "categories": [
+      "towny",
+      "survival"
+    ],
+    "description": "A fun and friendly towny server.",
+    "version": "1.16-1.21"
+  },
+  {
+    "name": "WilderCraft",
+    "ip": "play.wildercraft.net",
+    "categories": [
+      "survival",
+      "vanilla"
+    ],
+    "description": "Simple, non-toxic survival.",
+    "version": "1.16-1.21"
+  },
+  {
+    "name": "Cosmic PvP",
+    "ip": "play.cosmicpvp.com",
+    "categories": [
+      "factions",
+      "pvp"
+    ],
+    "description": "Space-themed factions with custom enchants.",
+    "version": "1.8"
+  },
+  {
+    "name": "Creative Fun",
+    "ip": "play.creativefun.net",
+    "categories": [
+      "creative",
+      "plots"
+    ],
+    "description": "The best creative building community.",
+    "version": "1.8-1.21"
+  },
+  {
+    "name": "VindexCraft",
+    "ip": "play.vindexcraft.net",
+    "categories": [
+      "roleplay",
+      "city"
+    ],
+    "description": "The ultimate city roleplay experience.",
+    "version": "1.12.2-1.21"
+  },
+  {
+    "name": "Pixelmon Realms",
+    "ip": "play.pixelmonrealms.com",
+    "categories": [
+      "pixelmon",
+      "survival"
+    ],
+    "description": "A massive Pixelmon adventure.",
+    "version": "1.12.2-1.21"
+  },
+  {
+    "name": "PokeSaga",
+    "ip": "play.pokesaga.org",
+    "categories": [
+      "pixelmon",
+      "rpg"
+    ],
+    "description": "Legendary Pokemon journeys start here.",
+    "version": "1.12.2-1.21"
+  },
+  {
+    "name": "LemonCloud",
+    "ip": "mc.lemoncloud.net",
+    "categories": [
+      "skyblock",
+      "survival",
+      "factions"
+    ],
+    "description": "A fun and diverse network.",
+    "version": "1.8-1.21"
+  },
+  {
+    "name": "Safe Survival",
+    "ip": "mc.safesurvival.net",
+    "categories": [
+      "survival",
+      "vanilla"
+    ],
+    "description": "Safe and friendly vanilla survival.",
+    "version": "1.12.2-1.21"
+  },
+  {
+    "name": "OPBlocks",
+    "ip": "play.opblocks.com",
+    "categories": [
+      "prison",
+      "skyblock"
+    ],
+    "description": "High-quality OP Prison and Skyblock.",
+    "version": "1.8-1.21"
+  },
+  {
+    "name": "Vortex Network",
+    "ip": "play.vortexnetwork.net",
+    "categories": [
+      "prison",
+      "skyblock"
+    ],
+    "description": "Space-themed prison and skyblock.",
+    "version": "1.8-1.21"
+  },
+  {
+    "name": "The Archon",
+    "ip": "play.thearchon.net",
+    "categories": [
+      "factions",
+      "outpost"
+    ],
+    "description": "The most competitive factions network.",
+    "version": "1.8-1.21"
+  },
+  {
+    "name": "RinaOrc",
+    "ip": "play.rinaorc.com",
+    "categories": [
+      "french",
+      "minigames"
+    ],
+    "description": "Great French-speaking community.",
+    "version": "1.8-1.21"
+  },
+  {
+    "name": "NationsGlory",
+    "ip": "play.nationsglory.fr",
+    "categories": [
+      "geopolitical",
+      "nations"
+    ],
+    "description": "Build your nation on a world map.",
+    "version": "1.8-1.21"
+  },
+  {
+    "name": "BauSucht",
+    "ip": "play.bausucht.net",
+    "categories": [
+      "german",
+      "creative"
+    ],
+    "description": "The best German building server.",
+    "version": "1.8-1.21"
+  },
+  {
+    "name": "GrieferGames",
+    "ip": "play.griefergames.net",
+    "categories": [
+      "german",
+      "survival"
+    ],
+    "description": "The largest German survival network.",
+    "version": "1.8-1.21"
+  },
+  {
+    "name": "HyCraft",
+    "ip": "play.hycraft.us",
+    "categories": [
+      "spanish",
+      "pvp"
+    ],
+    "description": "Competitive Spanish PvP.",
+    "version": "1.8-1.21"
+  },
+  {
+    "name": "AnubisMC",
+    "ip": "play.anubismc.com",
+    "categories": [
+      "pixelmon",
+      "skyblock"
+    ],
+    "description": "Unique Pixelmon skyblock adventure.",
+    "version": "1.12.2-1.21"
+  },
+  {
+    "name": "MC Cities",
+    "ip": "play.mccities.com",
+    "categories": [
+      "roleplay",
+      "city"
+    ],
+    "description": "Live your best life in MC Cities.",
+    "version": "1.16-1.21"
+  },
+  {
+    "name": "Stray",
+    "ip": "stray.gg",
+    "categories": [
+      "pvp",
+      "practice",
+      "ranked"
+    ],
+    "description": "Ranked practice PvP.",
+    "version": "1.7-1.21",
+    "featured": true
+  },
+  {
+    "name": "Zeqa",
+    "ip": "zeqa.net",
+    "categories": [
+      "pvp",
+      "practice",
+      "ranked"
+    ],
+    "description": "Competitive Practice Network.",
+    "version": "1.8-1.21",
+    "featured": false
+  },
+  {
+    "name": "Mythic",
+    "ip": "mythic.gg",
+    "categories": [
+      "pvp",
+      "practice",
+      "ranked"
+    ],
+    "description": "High-quality PvP practice.",
+    "version": "1.7-1.21",
+    "featured": false
+  }
+]
