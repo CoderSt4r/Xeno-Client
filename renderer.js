@@ -117,6 +117,7 @@ launchBtn.addEventListener('click', () => {
     launchProgressTrack.classList.remove('hidden');
     launchProgressFill.style.width = '5%';
 });
+let launchMsgTimeout;
 window.electronAPI.onLauncherStatus((data) => {
     launchStatusText.textContent = data.message;
     if (data.type === 'progress') {
@@ -124,10 +125,13 @@ window.electronAPI.onLauncherStatus((data) => {
         if (cur < 90) launchProgressFill.style.width = (cur + 1.5) + '%';
     } else if (data.type === 'launching') {
         launchProgressFill.style.width = '100%';
-        setTimeout(() => { launchProgressTrack.classList.add('hidden'); launchStatusText.textContent = 'Game is running'; }, 1200);
+        clearTimeout(launchMsgTimeout);
+        launchMsgTimeout = setTimeout(() => { launchProgressTrack.classList.add('hidden'); launchStatusText.textContent = 'Game is running'; }, 1200);
     } else if (data.type === 'close') {
+        clearTimeout(launchMsgTimeout);
         resetLaunch(); launchStatusText.textContent = 'Ready to play';
     } else if (data.type === 'error') {
+        clearTimeout(launchMsgTimeout);
         resetLaunch(); launchStatusText.textContent = 'Error: ' + data.message;
     }
 });
