@@ -1,6 +1,6 @@
 {
   "name": "xenoclient",
-  "version": "1.0.21",
+  "version": "1.0.22",
   "description": "Advanced Minecraft Launcher",
   "main": "main.js",
   "scripts": {
