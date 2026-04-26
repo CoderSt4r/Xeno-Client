@@ -25,36 +25,8 @@ function getAdoptiumApi() {
 function findSystemJava() {
     const isWin = process.platform === 'win32';
     const javaExe = isWin ? 'java.exe' : 'java';
-    const candidates = [
-        path.join(JAVA_DIR, 'bin', javaExe)
-    ];
-
-    if (isWin) {
-        const programFiles = [process.env.ProgramFiles, process.env['ProgramFiles(x86)']];
-        programFiles.forEach(pf => {
-            if (!pf) return;
-            const jDirs = [path.join(pf, 'Java'), path.join(pf, 'Eclipse Foundation'), path.join(pf, 'Adoptium')];
-            jDirs.forEach(jd => {
-                if (fs.existsSync(jd)) {
-                    fs.readdirSync(jd).forEach(v => {
-                        candidates.push(path.join(jd, v, 'bin', 'java.exe'));
-                        candidates.push(path.join(jd, v, 'jre', 'bin', 'java.exe'));
-                    });
-                }
-            });
-        });
-        if (process.env.JAVA_HOME) candidates.push(path.join(process.env.JAVA_HOME, 'bin', 'java.exe'));
-    } else {
-        candidates.push('/usr/bin/java', '/usr/local/bin/java', '/usr/lib/jvm/default-java/bin/java');
-        try {
-            const which = execSync('which java').toString().trim();
-            if (which) candidates.push(which);
-        } catch (_) { }
-    }
-
-    for (const p of candidates) {
-        if (p && fs.existsSync(p)) return p;
-    }
+    const managedJava = path.join(JAVA_DIR, 'bin', javaExe);
+    if (fs.existsSync(managedJava)) return managedJava;
     return null;
 }
 async function downloadFile(url, dest) {
