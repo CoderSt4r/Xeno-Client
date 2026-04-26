@@ -329,7 +329,10 @@ ipcMain.on('launch-game', async (event, settings) => {
             }
         });
         launcher.on('data', (e) => send('progress', String(e).slice(0, 120)));
-        launcher.on('close', () => { cachedMsToken = null; send('close', 'Game closed.'); });
+        launcher.on('close', (code) => { 
+            if (code !== 0) send('error', `Game crashed (Exit Code: ${code}). Wrong Java version or bad drivers?`);
+            else send('close', 'Game closed.'); 
+        });
         await launcher.launch(opts);
         send('launching', 'Minecraft is launching!');
     } catch (error) {
